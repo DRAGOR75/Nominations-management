@@ -47,7 +47,7 @@ export async function sendEmail(to: string, subject: string, html: string) {
 }
 
 /**
- * NOMINATION APPROVAL FUNCTION
+ * 1. NOMINATION APPROVAL FUNCTION (For Managers)
  */
 export async function sendApprovalEmail(
   managerEmail: string,
@@ -56,7 +56,6 @@ export async function sendApprovalEmail(
   justification: string,
   nominationId: string
 ) {
-  // ✅ FIX: Get the correct URL (Localhost vs templtrainingportal)
   const baseUrl = getBaseUrl();
   const approvalLink = `${baseUrl}/nominations/manager/${nominationId}`;
 
@@ -87,4 +86,41 @@ export async function sendApprovalEmail(
     `;
 
   return await sendEmail(managerEmail, `Action Required: Nomination Approval for ${nomineeName}`, html);
+}
+
+/**
+ * 2. FEEDBACK REQUEST EMAIL (For Employees)
+ * 🟢 Added this back so your feedback system works!
+ */
+export async function sendFeedbackRequestEmail(
+  employeeEmail: string,
+  employeeName: string,
+  programName: string,
+  enrollmentId: string
+) {
+  const baseUrl = getBaseUrl();
+  const feedbackLink = `${baseUrl}/feedback/employee/${enrollmentId}`;
+
+  const html = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+        <h2 style="color: #2e7d32; border-bottom: 2px solid #2e7d32; padding-bottom: 10px;">Training Feedback Request</h2>
+        
+        <p>Dear <strong>${employeeName}</strong>,</p>
+        
+        <p>You recently completed the training program: <strong style="color: #2c3e50;">${programName}</strong>.</p>
+        
+        <p>We value your feedback! Please take a moment to rate the effectiveness of this training to help us improve.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${feedbackLink}" style="background-color: #2e7d32; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+            Submit Feedback
+          </a>
+        </div>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin-top: 30px;">
+        <p style="font-size: 12px; color: #888; text-align: center;">Thriveni Training & Development System</p>
+      </div>
+    `;
+
+  return await sendEmail(employeeEmail, `Feedback Required: ${programName}`, html);
 }

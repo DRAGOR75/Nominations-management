@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -6,6 +7,24 @@ export default function Home() {
 
       {/* Main Container */}
       <div className="max-w-4xl w-full space-y-12">
+
+        {/* Logo Header Section */}
+        <div className="flex justify-between items-center w-full mb-8">
+          <Image
+            src="/Loyyds metals logo.png" // LLOYDS METALS logo
+            alt="Lloyds Metals Logo"
+            width={200}
+            height={50}
+            className="h-auto"
+          />
+          <Image
+            src="/Thriveni logo.webp" // THRIVENI logo
+            alt="Thriveni Logo"
+            width={200}
+            height={50}
+            className="h-auto"
+          />
+        </div>
 
         {/* Header Section */}
         <div className="text-center space-y-4">
@@ -64,7 +83,7 @@ export default function Home() {
 
         {/* Footer */}
         <div className="text-center pt-8 text-slate-400 text-sm">
-          Thriveni Earthmovers Pvt. Ltd. | Internal Tool
+          Thriveni Earthmovers And Infra Pvt. Ltd. | Training Department
         </div>
 
       </div>

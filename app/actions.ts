@@ -2,7 +2,8 @@
 
 import { db } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { sendEmail } from '@/lib/email';
+// 🟢 FIX: Import the new helper function
+import { sendEmail, sendFeedbackRequestEmail } from '@/lib/email';
 
 // --- TYPES ---
 export type ParticipantData = {
@@ -97,7 +98,9 @@ export async function submitEmployeeFeedback(formData: FormData) {
         });
 
         // 2. Send Email to Manager
-        const managerLink = `http://localhost:3000/feedback/manager/${enrollmentId}`;
+        // 🟢 FIX: Use Production URL logic here
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://templtrainingportal.vercel.app';
+        const managerLink = `${baseUrl}/feedback/manager/${enrollmentId}`;
 
         await sendEmail(
             updatedEnrollment.managerEmail,
@@ -156,19 +159,13 @@ export async function sendFeedbackEmails(sessionId: string) {
 
         for (const enrollment of session.enrollments) {
             if (enrollment.status === 'Pending') {
-                const feedbackLink = `http://localhost:3000/feedback/employee/${enrollment.id}`;
-
-                await sendEmail(
+                // 🟢 FIX: Use the new helper function we created in lib/email.ts
+                // This automatically handles the URL generation for production
+                await sendFeedbackRequestEmail(
                     enrollment.employeeEmail,
-                    `Feedback Requested: ${session.programName}`,
-                    `
-                    <p>Hi ${enrollment.employeeName},</p>
-                    <p>The training <strong>"${session.programName}"</strong> has concluded.</p>
-                    <p>Please take 2 minutes to provide your effectiveness rating.</p>
-                    <p><a href="${feedbackLink}"> Click here to Rate the Training</a></p>
-                    <br/>
-                    <p><em>Thriveni Training System</em></p>
-                    `
+                    enrollment.employeeName,
+                    session.programName,
+                    enrollment.id
                 );
             }
         }
@@ -215,12 +212,11 @@ export async function createTrainingSession(formData: FormData) {
     }
 }
 
-// 7. ADD PARTICIPANTS (CSV/MANUAL) - NEW!
+// 7. ADD PARTICIPANTS (CSV/MANUAL)
 export async function addParticipants(sessionId: string, participants: ParticipantData[]) {
     try {
         if (!sessionId) return { success: false, error: "Session ID missing" };
 
-        // Bulk Insert with skipDuplicates to prevent errors if email already exists in session
         await db.enrollment.createMany({
             data: participants.map((p) => ({
                 sessionId,
