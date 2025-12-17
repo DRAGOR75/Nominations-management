@@ -4,18 +4,31 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // Ensure .env matches this variable name
+    user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
 /**
+ * HELPER: Get the Base URL (Production Safe)
+ */
+const getBaseUrl = () => {
+  // 1. Development Mode always uses localhost
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000';
+  }
+
+  // 2. If you set NEXT_PUBLIC_APP_URL in Vercel, use it (Best Practice)
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+
+  // 3. Fallback to the specific URL you found (Safety Net)
+  return 'https://templtrainingportal.vercel.app';
+};
+
+/**
  * GENERIC EMAIL FUNCTION
- * ---------------------------------------------------------
- * CRITICAL: This function is used by the Feedback System.
- * DO NOT MODIFY this function to ensure feedback emails 
- * continue to work without interruption.
- * ---------------------------------------------------------
  */
 export async function sendEmail(to: string, subject: string, html: string) {
   try {
@@ -35,20 +48,16 @@ export async function sendEmail(to: string, subject: string, html: string) {
 
 /**
  * NOMINATION APPROVAL FUNCTION
- * ---------------------------------------------------------
- * Updated to use the new secure Nomination ID link.
- * ---------------------------------------------------------
  */
 export async function sendApprovalEmail(
   managerEmail: string,
   managerName: string,
   nomineeName: string,
   justification: string,
-  nominationId: string // <--- NEW: Required to generate the correct link
+  nominationId: string
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-
-  // ✅ NEW LINK: Points to the secure manager approval page
+  // ✅ FIX: Get the correct URL (Localhost vs templtrainingportal)
+  const baseUrl = getBaseUrl();
   const approvalLink = `${baseUrl}/nominations/manager/${nominationId}`;
 
   const html = `
