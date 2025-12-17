@@ -2,19 +2,35 @@ import { db } from '@/lib/db';
 import { submitEmployeeFeedback } from '@/app/actions';
 import { redirect } from 'next/navigation';
 
-// Update the type definition to wrap params in Promise
+// 🟢 FIX STEP 1: Move this component OUTSIDE the main function
+const RatingQuestion = ({ label, name }: { label: string; name: string }) => (
+    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+        <label className="block text-slate-800 font-medium mb-3">{label}</label>
+        <div className="flex justify-between items-center px-2">
+            {[1, 2, 3, 4, 5].map((num) => (
+                <label key={num} className="cursor-pointer group flex flex-col items-center gap-1">
+                    <input required type="radio" name={name} value={num} className="peer w-5 h-5 text-blue-600 accent-blue-600" />
+                    <span className="text-xs text-slate-400 group-hover:text-blue-600 peer-checked:font-bold peer-checked:text-blue-700">{num}</span>
+                </label>
+            ))}
+        </div>
+        <div className="flex justify-between text-[10px] text-slate-400 mt-2 px-2 uppercase tracking-wide">
+            <span>Strongly Disagree</span>
+            <span>Strongly Agree</span>
+        </div>
+    </div>
+);
+
+// 🟢 FIX STEP 2: Main component stays clean
 export default async function EmployeeFeedbackPage({ params }: { params: Promise<{ id: string }> }) {
 
-    // 1. UNWRAP THE PARAMS (The Fix)
     const { id } = await params;
 
-    // 2. Fetch data using the unwrapped 'id'
     const enrollment = await db.enrollment.findUnique({
-        where: { id: id }, // Use the variable 'id', not 'params.id'
+        where: { id: id },
         include: { session: true },
     });
 
-    // ... (The rest of your code remains exactly the same)
     if (!enrollment) return <div className="p-8 text-red-500">Invalid Link.</div>;
     if (enrollment.status !== 'Pending') return <div className="p-8 text-green-600">Feedback already submitted.</div>;
 
@@ -23,24 +39,6 @@ export default async function EmployeeFeedbackPage({ params }: { params: Promise
         await submitEmployeeFeedback(formData);
         redirect('/feedback/success');
     }
-
-    const RatingQuestion = ({ label, name }: { label: string; name: string }) => (
-        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <label className="block text-slate-800 font-medium mb-3">{label}</label>
-            <div className="flex justify-between items-center px-2">
-                {[1, 2, 3, 4, 5].map((num) => (
-                    <label key={num} className="cursor-pointer group flex flex-col items-center gap-1">
-                        <input required type="radio" name={name} value={num} className="peer w-5 h-5 text-blue-600 accent-blue-600" />
-                        <span className="text-xs text-slate-400 group-hover:text-blue-600 peer-checked:font-bold peer-checked:text-blue-700">{num}</span>
-                    </label>
-                ))}
-            </div>
-            <div className="flex justify-between text-[10px] text-slate-400 mt-2 px-2 uppercase tracking-wide">
-                <span>Strongly Disagree</span>
-                <span>Strongly Agree</span>
-            </div>
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
@@ -51,10 +49,10 @@ export default async function EmployeeFeedbackPage({ params }: { params: Promise
                 </div>
 
                 <form action={saveFeedback} className="p-8 space-y-6">
-                    {/* Use the unwrapped 'id' here too */}
                     <input type="hidden" name="enrollmentId" value={id} />
 
                     <div className="space-y-4">
+                        {/* Now these work perfectly because the component is defined outside */}
                         <RatingQuestion name="q1" label="Q1. This program was relevant and useful for my current work." />
                         <RatingQuestion name="q2" label="Q2. I am able to apply most of the knowledge/skills at my workplace." />
                         <RatingQuestion name="q3" label="Q3. I am able to do my job better after the training." />
