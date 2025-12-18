@@ -24,7 +24,9 @@ type Session = {
 type Trainer = {
     id: string;
     name: string;
-    expertise: string | null;
+    email: string | null;
+    phone: string | null;
+    createdAt: Date;
 };
 
 export default function AdminDashboard() {
