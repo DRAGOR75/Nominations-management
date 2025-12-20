@@ -1,6 +1,17 @@
 import { db } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { selfEnroll } from '@/app/actions/enrollment';
+import {
+    Calendar,
+    User,
+    Briefcase,
+    Mail,
+    Star,
+    MessageSquare,
+    CheckCircle2,
+    Building2,
+    BookOpen
+} from 'lucide-react';
 
 export default async function JoinSessionPage({ params }: { params: Promise<{ sessionId: string }> }) {
     // Await params in Next.js 15+
@@ -15,153 +26,261 @@ export default async function JoinSessionPage({ params }: { params: Promise<{ se
 
     // Helper to format date
     const dateStr = new Date(session.endDate).toLocaleDateString('en-US', {
-        day: 'numeric', month: 'short', year: 'numeric'
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     });
 
     return (
-        <div className="min-h-screen bg-slate-50 py-10 px-4 font-sans">
-            <div className="max-w-2xl w-full mx-auto bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+        <div className="min-h-screen bg-slate-50 py-12 px-4 font-sans text-slate-800">
+            <div className="max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 overflow-hidden">
 
                 {/* Header Section */}
-                <div className="bg-blue-700 p-8 text-white text-center">
-                    <h1 className="text-2xl font-bold mb-2">Training Feedback & Attendance</h1>
-                    <p className="text-blue-100 text-sm mb-6">Please fill this form to mark your attendance.</p>
+                <div className="bg-gradient-to-r from-blue-700 to-blue-900 p-10 text-white relative overflow-hidden">
+                    {/* Background Pattern */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24 pointer-events-none"></div>
 
-                    <div className="grid grid-cols-2 gap-4 text-left bg-blue-800/50 p-4 rounded-lg border border-blue-500/30">
-                        <div>
-                            <p className="text-[10px] uppercase text-blue-300 tracking-wider">Program Name</p>
-                            <p className="font-semibold text-lg">{session.programName}</p>
+                    <div className="relative z-10 text-center">
+                        <div className="inline-flex items-center gap-2 bg-blue-800/50 backdrop-blur-sm px-4 py-1.5 rounded-full border border-blue-400/30 text-blue-100 text-xs font-bold uppercase tracking-widest mb-4">
+                            <CheckCircle2 size={14} /> Official Training Record
                         </div>
-                        <div>
-                            <p className="text-[10px] uppercase text-blue-300 tracking-wider">Trainer</p>
-                            <p className="font-semibold text-lg">{session.trainerName}</p>
+                        <h1 className="text-3xl font-extrabold mb-3 tracking-tight">Training Feedback & Attendance</h1>
+                        <p className="text-blue-100/90 text-base max-w-lg mx-auto font-medium">
+                            Complete this form to mark your attendance and share your valuable feedback.
+                        </p>
+                    </div>
+
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                            <div className="flex items-center gap-3 mb-1">
+                                <div className="p-2 bg-blue-500/20 rounded-lg">
+                                    <BookOpen size={18} className="text-blue-200" />
+                                </div>
+                                <p className="text-[10px] uppercase text-blue-200 font-bold tracking-wider">Program</p>
+                            </div>
+                            <p className="font-bold text-lg text-white leading-tight pl-[3.25rem]">{session.programName}</p>
                         </div>
-                        <div className="col-span-2">
-                            <p className="text-[10px] uppercase text-blue-300 tracking-wider">Session Date</p>
-                            <p className="font-semibold">{dateStr}</p>
+
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                            <div className="flex items-center gap-3 mb-1">
+                                <div className="p-2 bg-blue-500/20 rounded-lg">
+                                    <User size={18} className="text-blue-200" />
+                                </div>
+                                <p className="text-[10px] uppercase text-blue-200 font-bold tracking-wider">Trainer</p>
+                            </div>
+                            <p className="font-bold text-lg text-white leading-tight pl-[3.25rem]">{session.trainerName}</p>
+                        </div>
+
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                            <div className="flex items-center gap-3 mb-1">
+                                <div className="p-2 bg-blue-500/20 rounded-lg">
+                                    <Calendar size={18} className="text-blue-200" />
+                                </div>
+                                <p className="text-[10px] uppercase text-blue-200 font-bold tracking-wider">Date</p>
+                            </div>
+                            <p className="font-bold text-lg text-white leading-tight pl-[3.25rem]">{dateStr}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* The Form */}
-                <form action={selfEnroll} className="p-8 space-y-8">
+                <form action={selfEnroll} className="p-8 md:p-10 space-y-10">
                     <input type="hidden" name="sessionId" value={sessionId} />
 
                     {/* SECTION 1: Personal Details */}
-                    <section className="space-y-4">
-                        <h3 className="text-lg font-bold text-slate-800 border-b pb-2">1. Your Details</h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="label-text">Full Name *</label>
-                                <input name="name" required type="text" className="input-field" placeholder="John Doe" />
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <User size={20} />
                             </div>
                             <div>
-                                <label className="label-text">Employee ID *</label>
-                                <input name="empId" required type="text" className="input-field" placeholder="EMP123" />
+                                <h3 className="text-lg font-bold text-slate-800">Your Details</h3>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Please identify yourself</p>
                             </div>
                         </div>
-                        <div>
-                            <label className="label-text">Official Email *</label>
-                            <input name="email" required type="email" className="input-field" placeholder="john@thriveni.com" />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <InputField
+                                label="Full Name"
+                                name="name"
+                                icon={<User size={16} />}
+                                placeholder="e.g. John Doe"
+                            />
+                            <InputField
+                                label="Employee ID"
+                                name="empId"
+                                icon={<Building2 size={16} />}
+                                placeholder="e.g. EMP001"
+                            />
+                            <div className="md:col-span-2">
+                                <InputField
+                                    label="Official Email"
+                                    name="email"
+                                    type="email"
+                                    icon={<Mail size={16} />}
+                                    placeholder="e.g. john.doe@thriveni.com"
+                                />
+                            </div>
                         </div>
                     </section>
 
                     {/* SECTION 2: Manager Details */}
-                    <section className="space-y-4">
-                        <h3 className="text-lg font-bold text-slate-800 border-b pb-2">2. Reporting Manager</h3>
-                        <p className="text-xs text-slate-500">We need this for the post-training effectiveness review.</p>
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                            <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                <Briefcase size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-800">Reporting Manager</h3>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">For effectiveness review</p>
+                            </div>
+                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="label-text">Manager Name *</label>
-                                <input name="managerName" required type="text" className="input-field" />
-                            </div>
-                            <div>
-                                <label className="label-text">Manager Email *</label>
-                                <input name="managerEmail" required type="email" className="input-field" />
-                            </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <InputField
+                                label="Manager Name"
+                                name="managerName"
+                                icon={<User size={16} />}
+                                placeholder="e.g. Jane Smith"
+                            />
+                            <InputField
+                                label="Manager Email"
+                                name="managerEmail"
+                                type="email"
+                                icon={<Mail size={16} />}
+                                placeholder="e.g. jane.smith@thriveni.com"
+                            />
                         </div>
                     </section>
 
                     {/* SECTION 3: Ratings (1-5) */}
-                    <section className="space-y-6">
-                        <h3 className="text-lg font-bold text-slate-800 border-b pb-2">3. Feedback Ratings</h3>
-                        <p className="text-xs text-slate-500 mb-4">Scale: 1 (Poor) to 5 (Excellent)</p>
+                    <section className="space-y-8">
+                        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                            <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+                                <Star size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-800">Feedback Ratings</h3>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Scale: 1 (Poor) to 5 (Excellent)</p>
+                            </div>
+                        </div>
 
-                        <RatingField label="Rate your knowledge level BEFORE training" name="preTrainingRating" />
-                        <RatingField label="Rate your knowledge level AFTER training" name="postTrainingRating" />
-                        <RatingField label="How do you like the training?" name="trainingRating" />
-                        <RatingField label="Contents covered are useful for my work" name="contentRating" />
-                        <RatingField label="Trainer Knowledge and Delivery" name="trainerRating" />
-                        <RatingField label="Training Material Quality" name="materialRating" />
-                        <RatingField label="I will recommend this training to others" name="recommendationRating" />
+                        <div className="grid grid-cols-1 gap-x-8 gap-y-6">
+                            <StarRatingField label="Rate your knowledge level BEFORE training" name="preTrainingRating" />
+                            <StarRatingField label="Rate your knowledge level AFTER training" name="postTrainingRating" />
+                            <StarRatingField label="How would you rate the overall training?" name="trainingRating" />
+                            <StarRatingField label="Contents covered were useful for my work" name="contentRating" />
+                            <StarRatingField label="Trainer Knowledge and Delivery" name="trainerRating" />
+                            <StarRatingField label="Quality of Training Materials" name="materialRating" />
+                            <StarRatingField label="I would recommend this training to others" name="recommendationRating" />
+                        </div>
                     </section>
 
                     {/* SECTION 4: Qualitative Feedback */}
-                    <section className="space-y-4">
-                        <h3 className="text-lg font-bold text-slate-800 border-b pb-2">4. Comments</h3>
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                            <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                <MessageSquare size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-800">Additional Comments</h3>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Your thoughts matter</p>
+                            </div>
+                        </div>
 
-                        <div>
-                            <label className="label-text">Topics learned & Activities done</label>
-                            <textarea name="topicsLearned" rows={2} className="input-field" placeholder="Short answer..."></textarea>
-                        </div>
-                        <div>
-                            <label className="label-text">Action Plan (How will you use this?)</label>
-                            <textarea name="actionPlan" rows={2} className="input-field" placeholder="Short answer..."></textarea>
-                        </div>
-                        <div>
-                            <label className="label-text">Suggestions for Improvement</label>
-                            <textarea name="suggestions" rows={2} className="input-field" placeholder="Short answer..."></textarea>
+                        <div className="space-y-6">
+                            <TextAreaField
+                                label="Topics learned & Activities done"
+                                name="topicsLearned"
+                                placeholder="What were the key takeaways from this session?"
+                            />
+                            <TextAreaField
+                                label="Action Plan (How will you use this?)"
+                                name="actionPlan"
+                                placeholder="How do you plan to apply this knowledge in your daily work?"
+                            />
+                            <TextAreaField
+                                label="Suggestions for Improvement"
+                                name="suggestions"
+                                placeholder="Any ideas on how we can make this training better?"
+                            />
                         </div>
                     </section>
 
-                    <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-lg shadow-lg transition transform hover:scale-[1.01] mt-4">
-                        ✅ Submit Feedback & Enroll
+                    <button type="submit" className="w-full group bg-blue-700 hover:bg-blue-800 text-white font-bold py-5 rounded-xl shadow-lg hover:shadow-blue-200 transition-all transform hover:-translate-y-0.5 mt-8 flex items-center justify-center gap-3">
+                        <CheckCircle2 size={24} className="group-hover:scale-110 transition-transform" />
+                        <span className="text-lg">Submit Feedback & Enroll</span>
                     </button>
                 </form>
 
             </div>
-
-            {/* 🟢 UPDATED STYLES HERE */}
-            <style>{`
-        .label-text { display: block; font-size: 0.875rem; font-weight: 600; color: #334155; margin-bottom: 0.25rem; }
-        
-        /* Added background-color and color */
-        .input-field { 
-            width: 100%; 
-            padding: 0.75rem; 
-            border: 1px solid #cbd5e1; 
-            background-color: #f8fafc; /* Slight gray background */
-            color: #1e293b; /* Dark text color */
-            border-radius: 0.5rem; 
-            outline: none; 
-            transition: all 0.2s; 
-        }
-
-        /* Added explicit color for placeholders */
-        .input-field::placeholder {
-            color: #94a3b8; /* Lighter gray for placeholder */
-        }
-
-        .input-field:focus { border-color: #3b82f6; ring: 2px; ring-color: #3b82f6; background-color: #ffffff; }
-      `}</style>
         </div>
     );
 }
 
-// Helper Component for the 1-5 Radio Buttons
-function RatingField({ label, name }: { label: string, name: string }) {
+// --- Helper Components ---
+
+function InputField({ label, name, type = "text", placeholder, icon }: { label: string, name: string, type?: string, placeholder?: string, icon?: React.ReactNode }) {
     return (
-        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-            <label className="block text-sm font-medium text-slate-700 mb-3">{label}</label>
-            <div className="flex justify-between max-w-xs">
-                {[1, 2, 3, 4, 5].map((num) => (
-                    <label key={num} className="cursor-pointer flex flex-col items-center gap-1 group">
-                        <input type="radio" name={name} value={num} required className="w-5 h-5 accent-blue-600 cursor-pointer" />
-                        <span className="text-xs text-slate-400 group-hover:text-blue-600 font-medium">{num}</span>
-                    </label>
-                ))}
+        <div className="space-y-1.5">
+            <label className="block text-sm font-bold text-slate-700 ml-1">{label} <span className="text-red-500">*</span></label>
+            <div className="relative group">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    {icon}
+                </div>
+                <input
+                    name={name}
+                    required
+                    type={type}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-slate-100/50"
+                    placeholder={placeholder}
+                />
+            </div>
+        </div>
+    )
+}
+
+function TextAreaField({ label, name, placeholder }: { label: string, name: string, placeholder?: string }) {
+    return (
+        <div className="space-y-1.5">
+            <label className="block text-sm font-bold text-slate-700 ml-1">{label}</label>
+            <textarea
+                name={name}
+                rows={3}
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-slate-100/50 resize-y min-h-[100px]"
+                placeholder={placeholder}
+            ></textarea>
+        </div>
+    )
+}
+
+function StarRatingField({ label, name }: { label: string, name: string }) {
+    return (
+        <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-blue-100 transition-colors">
+            <label className="block text-sm font-bold text-slate-700 mb-3">{label}</label>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-8">
+                <div className="flex flex-row-reverse justify-end gap-1 group/rating">
+                    {[5, 4, 3, 2, 1].map((num) => (
+                        <div key={num} className="relative">
+                            <input
+                                type="radio"
+                                name={name}
+                                id={`${name}-${num}`}
+                                value={num}
+                                required
+                                className="peer sr-only"
+                            />
+                            <label
+                                htmlFor={`${name}-${num}`}
+                                className="cursor-pointer text-slate-300 peer-checked:text-amber-400 hover:text-amber-300 peer-hover:text-amber-300 transition-colors"
+                            >
+                                <Star size={28} fill="currentColor" strokeWidth={1} />
+                            </label>
+                        </div>
+                    ))}
+                </div>
+                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:block">
+                    Select 1 to 5 Stars
+                </div>
             </div>
         </div>
     );
