@@ -196,13 +196,30 @@ export async function createTrainingSession(formData: FormData) {
         return { success: false, message: "Missing required fields" };
     }
 
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
     try {
+        // 1. Check for Duplicates (Double-click prevention / Logic check)
+        const existingSession = await db.trainingSession.findFirst({
+            where: {
+                programName,
+                startDate,
+                endDate,
+            },
+        });
+
+        if (existingSession) {
+            return { success: false, message: "A session with this name and dates already exists." };
+        }
+
+        // 2. Create Session
         await db.trainingSession.create({
             data: {
                 programName,
                 trainerName,
-                startDate: new Date(startDateStr),
-                endDate: new Date(endDateStr),
+                startDate,
+                endDate,
                 // Only set this if the user provided it, otherwise it can be null or handled by logic
                 feedbackCreationDate: feedbackDateStr ? new Date(feedbackDateStr) : null,
                 templateType: 'Technical',
