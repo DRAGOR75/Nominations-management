@@ -18,7 +18,7 @@ export async function notifyManagerAction(nominationId: string) {
         return await sendApprovalEmail(
             nomination.managerEmail,
             nomination.managerName,
-            nomination.nomineeName,
+            nomination.employeeName,
             nomination.justification || "Training nomination request",
             nomination.id
         );
