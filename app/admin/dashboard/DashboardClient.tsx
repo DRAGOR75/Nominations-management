@@ -54,11 +54,7 @@ export default function DashboardClient({
     initialPendingReviews
 }: DashboardClientProps) {
     const [date, setDate] = useState<any>(new Date());
-    // We can use state if we need client-side updates, 
-    // but typically server actions + router.refresh() handles updates.
-    // However, keeping state allows for immediate UI updates if we wanted.
-    // For this refactor, we'll initialize with props.
-    // Since revalidatePath reloads the page, props will update.
+
     const sessions = initialSessions;
     const trainers = initialTrainers;
     const pendingReviews = initialPendingReviews;
@@ -69,16 +65,21 @@ export default function DashboardClient({
         return `${s.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${e.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
     };
 
+    const isSameDateOrInRange = (checkDate: Date, start: Date, end: Date) => {
+        const d = new Date(checkDate);
+        const s = new Date(start);
+        const e = new Date(end);
+
+        d.setHours(0, 0, 0, 0);
+        s.setHours(0, 0, 0, 0);
+        e.setHours(23, 59, 59, 999);
+
+        return d >= s && d <= e;
+    };
+
     const tileContent = ({ date, view }: { date: Date; view: string }) => {
         if (view === 'month') {
-            const hasSession = sessions.some(s => {
-                const start = new Date(s.startDate);
-                const end = new Date(s.endDate);
-                const current = new Date(date);
-                start.setHours(0, 0, 0, 0);
-                end.setHours(23, 59, 59, 999);
-                return current >= start && current <= end;
-            });
+            const hasSession = sessions.some(s => isSameDateOrInRange(date, s.startDate, s.endDate));
 
             if (hasSession) {
                 return (
@@ -90,6 +91,8 @@ export default function DashboardClient({
         }
         return null;
     };
+
+    const filteredSessions = sessions.filter(s => isSameDateOrInRange(date, s.startDate, s.endDate));
 
     const downloadQRCode = (sessionId: string, programName: string) => {
         const svg = document.getElementById(`qr-${sessionId}`);
@@ -176,16 +179,18 @@ export default function DashboardClient({
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                         <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
                             <QrCode className="text-blue-700" size={20} />
-                            <h2 className="text-lg font-bold text-slate-900">Active Sessions</h2>
+                            <h2 className="text-lg font-bold text-slate-900">
+                                {date ? `Active Sessions (${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})` : 'Active Sessions'}
+                            </h2>
                         </div>
 
-                        {sessions.length === 0 ? (
+                        {filteredSessions.length === 0 ? (
                             <div className="text-center py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                                <p className="text-slate-500 font-medium italic">No active sessions found.</p>
+                                <p className="text-slate-500 font-medium italic">No active sessions found for this date.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {sessions.map((t) => (
+                                {filteredSessions.map((t) => (
                                     <div key={t.id} className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-blue-300 hover:shadow-md transition-all group">
                                         <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                                             <div className="flex-1 space-y-4">
