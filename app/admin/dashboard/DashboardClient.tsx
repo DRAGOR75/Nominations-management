@@ -30,6 +30,7 @@ type Session = {
     trainerName: string | null;
     startDate: Date;
     endDate: Date;
+    feedbackCreationDate?: Date | null;
     emailsSent: boolean;
     enrollments: any[];
 };
@@ -65,26 +66,38 @@ export default function DashboardClient({
         return `${s.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${e.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
     };
 
-    const isSameDateOrInRange = (checkDate: Date, start: Date, end: Date) => {
-        const d = new Date(checkDate);
-        const s = new Date(start);
-        const e = new Date(end);
+    const isSameDay = (date1: Date, date2: Date) => {
+        if (!date1 || !date2) return false;
+        const d1 = new Date(date1);
+        const d2 = new Date(date2);
 
-        d.setHours(0, 0, 0, 0);
-        s.setHours(0, 0, 0, 0);
-        e.setHours(23, 59, 59, 999);
-
-        return d >= s && d <= e;
+        return d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate();
     };
 
     const tileContent = ({ date, view }: { date: Date; view: string }) => {
         if (view === 'month') {
-            const hasSession = sessions.some(s => isSameDateOrInRange(date, s.startDate, s.endDate));
+            // Check for Level 3 Feedback Date
+            const hasFeedbackTrigger = sessions.some(s =>
+                s.feedbackCreationDate && isSameDay(date, s.feedbackCreationDate)
+            );
 
-            if (hasSession) {
+            // Check for Session End Date
+            const hasSessionEnd = sessions.some(s => isSameDay(date, s.endDate));
+
+            if (hasFeedbackTrigger) {
                 return (
                     <div className="flex justify-center mt-1">
-                        <div className="h-1.5 w-1.5 bg-blue-600 rounded-full"></div>
+                        <div className="h-1.5 w-1.5 bg-red-600 rounded-full" title="Level 3 Feedback Trigger"></div>
+                    </div>
+                );
+            }
+
+            if (hasSessionEnd) {
+                return (
+                    <div className="flex justify-center mt-1">
+                        <div className="h-1.5 w-1.5 bg-blue-400 rounded-full" title="Session Ends"></div>
                     </div>
                 );
             }
@@ -92,7 +105,10 @@ export default function DashboardClient({
         return null;
     };
 
-    const filteredSessions = sessions.filter(s => isSameDateOrInRange(date, s.startDate, s.endDate));
+    const filteredSessions = sessions.filter(s =>
+        (s.feedbackCreationDate && isSameDay(date, s.feedbackCreationDate)) ||
+        isSameDay(date, s.endDate)
+    );
 
     const downloadQRCode = (sessionId: string, programName: string) => {
         const svg = document.getElementById(`qr-${sessionId}`);
@@ -142,6 +158,16 @@ export default function DashboardClient({
                                 tileContent={tileContent}
                                 className="rounded-xl border-none w-full p-2"
                             />
+                            <div className="flex gap-4 mt-4 text-xs justify-center">
+                                <div className="flex items-center gap-1">
+                                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                    <span className="text-slate-500">Session End</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                                    <span className="text-slate-500">L3 Feedback</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -180,13 +206,13 @@ export default function DashboardClient({
                         <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
                             <QrCode className="text-blue-700" size={20} />
                             <h2 className="text-lg font-bold text-slate-900">
-                                {date ? `Active Sessions (${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})` : 'Active Sessions'}
+                                {date ? `Sessions for ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'Active Sessions'}
                             </h2>
                         </div>
 
                         {filteredSessions.length === 0 ? (
                             <div className="text-center py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                                <p className="text-slate-500 font-medium italic">No active sessions found for this date.</p>
+                                <p className="text-slate-500 font-medium italic">No sessions scheduled for this date.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -211,6 +237,12 @@ export default function DashboardClient({
                                                         <CalendarIcon size={16} className="text-slate-400" />
                                                         <span>{formatDateRange(t.startDate, t.endDate)}</span>
                                                     </div>
+                                                    {t.feedbackCreationDate && (
+                                                        <div className="flex items-center gap-2 text-red-600">
+                                                            <CalendarIcon size={16} />
+                                                            <span>L3 Trigger: {new Date(t.feedbackCreationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                        </div>
+                                                    )}
                                                     <div className="flex items-center gap-2">
                                                         <Users size={16} className="text-slate-400" />
                                                         <span>{t.enrollments.length} Participants</span>
