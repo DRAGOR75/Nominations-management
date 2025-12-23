@@ -12,8 +12,8 @@ export async function GET() {
         port: 587,
         secure: false, // true for 465, false for other ports
         auth: {
-            user: '9e9f4e001@smtp-brevo.com',
-            pass: 'xsmtpsib-34d30ab02c87a58a3413c9d9e05d76fc897f47f6abdba8154b63aa9de4e120e9-ASmzeab9de3RiOB2', // 🔴 Your specific key
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_KEY,
         },
         tls: {
             rejectUnauthorized: false // Helps avoid some Vercel SSL handshake errors
