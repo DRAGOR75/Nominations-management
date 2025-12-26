@@ -102,33 +102,43 @@ export default function TrainerManager({ trainers }: { trainers: Trainer[] }) {
                         </div>
                     </form>
 
-                    {/* Trainer Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Trainer List */}
+                    <div className="flex flex-col gap-2">
                         {trainers.map((t) => (
-                            <div key={t.id} className="group p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all bg-white relative">
-                                <button
-                                    onClick={() => { if (confirm('Delete this trainer?')) deleteTrainer(t.id) }}
-                                    className="absolute top-3 right-3 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-
-                                <p className="font-bold text-slate-800 mb-3 pr-6">{t.name}</p>
-
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-slate-500">
-                                        <Mail size={14} className="shrink-0" />
-                                        <span className="text-xs truncate">{t.email}</span>
+                            <div key={t.id} className="group p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all bg-white flex items-center justify-between gap-4">
+                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 flex-1">
+                                    <div className="flex items-center gap-3 min-w-[200px]">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
+                                            {t.name.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-800">{t.name}</p>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2 text-slate-500">
-                                        <Phone size={14} className="shrink-0" />
-                                        <span className="text-xs">{t.phone || 'No phone'}</span>
+
+                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500">
+                                        <div className="flex items-center gap-2">
+                                            <Mail size={14} className="text-blue-400" />
+                                            <span>{t.email}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Phone size={14} className="text-emerald-400" />
+                                            <span>{t.phone || 'No phone'}</span>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <button
+                                    onClick={() => { if (confirm('Delete this trainer?')) deleteTrainer(t.id) }}
+                                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Delete Trainer"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
                             </div>
                         ))}
                         {trainers.length === 0 && (
-                            <div className="col-span-full py-10 text-center border-2 border-dashed border-slate-100 rounded-xl">
+                            <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-xl">
                                 <p className="text-slate-400 text-sm">No trainers found in the system.</p>
                             </div>
                         )}
