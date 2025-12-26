@@ -246,7 +246,11 @@ export default function DashboardClient({
                                         <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                                             <div className="flex-1 space-y-4">
                                                 <div className="flex justify-between items-start">
-                                                    <h3 className="font-black text-xl text-slate-900 tracking-tight group-hover:text-blue-700 transition-colors">{t.programName}</h3>
+                                                    <h3 className="font-black text-xl text-slate-900 tracking-tight group-hover:text-blue-700 transition-colors">
+                                                        <a href={`/admin/dashboard/session/${t.id}`} className="hover:underline">
+                                                            {t.programName}
+                                                        </a>
+                                                    </h3>
                                                     <span className={`flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-tighter ${t.emailsSent ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                                         {t.emailsSent ? <CheckCircle2 size={12} /> : <Clock size={12} />}
                                                         {t.emailsSent ? 'Completed' : 'Active'}

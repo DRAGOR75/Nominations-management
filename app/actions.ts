@@ -43,6 +43,24 @@ export async function getUpcomingSessions() {
     }
 }
 
+// 2.a SESSION DETAILS (Deep Dive)
+export async function getSessionDetails(sessionId: string) {
+    try {
+        const session = await db.trainingSession.findUnique({
+            where: { id: sessionId },
+            include: {
+                enrollments: {
+                    orderBy: { employeeName: 'asc' }
+                }
+            }
+        });
+        return session;
+    } catch (error) {
+        console.error("Error fetching session details:", error);
+        return null;
+    }
+}
+
 export async function submitNomination(formData: FormData) {
     const sessionId = formData.get('sessionId') as string;
     const name = formData.get('name') as string;
