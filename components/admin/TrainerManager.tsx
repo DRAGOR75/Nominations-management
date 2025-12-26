@@ -105,41 +105,42 @@ export default function TrainerManager({ trainers }: { trainers: Trainer[] }) {
                     {/* Trainer List */}
                     <div className="flex flex-col gap-2">
                         {trainers.map((t) => (
-                            <div key={t.id} className="group p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all bg-white flex items-center justify-between gap-4">
-                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 flex-1">
-                                    <div className="flex items-center gap-3 min-w-[200px]">
-                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
-                                            {t.name.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-slate-800">{t.name}</p>
-                                        </div>
-                                    </div>
+                            <div key={t.id} className="group p-3 border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all bg-white flex items-center gap-3">
+                                {/* Avatar */}
+                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm shrink-0">
+                                    {t.name.charAt(0)}
+                                </div>
 
-                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500">
-                                        <div className="flex items-center gap-2">
-                                            <Mail size={14} className="text-blue-400" />
-                                            <span>{t.email}</span>
+                                {/* Info Column - min-w-0 ensures truncation works */}
+                                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                    <p className="font-bold text-slate-800 text-sm truncate">{t.name}</p>
+                                    <div className="flex flex-col text-xs text-slate-500 mt-0.5">
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                            <Mail size={12} className="shrink-0 text-blue-400" />
+                                            <span className="truncate">{t.email}</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Phone size={14} className="text-emerald-400" />
-                                            <span>{t.phone || 'No phone'}</span>
-                                        </div>
+                                        {t.phone && (
+                                            <div className="flex items-center gap-1.5 min-w-0 mt-0.5">
+                                                <Phone size={12} className="shrink-0 text-emerald-400" />
+                                                <span className="truncate">{t.phone}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
+                                {/* Delete Button */}
                                 <button
                                     onClick={() => { if (confirm('Delete this trainer?')) deleteTrainer(t.id) }}
-                                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"
                                     title="Delete Trainer"
                                 >
-                                    <Trash2 size={18} />
+                                    <Trash2 size={16} />
                                 </button>
                             </div>
                         ))}
                         {trainers.length === 0 && (
-                            <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-xl">
-                                <p className="text-slate-400 text-sm">No trainers found in the system.</p>
+                            <div className="py-8 text-center border-2 border-dashed border-slate-100 rounded-xl">
+                                <p className="text-slate-400 text-sm">No trainers found.</p>
                             </div>
                         )}
                     </div>
