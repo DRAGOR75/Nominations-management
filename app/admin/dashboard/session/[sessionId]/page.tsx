@@ -7,7 +7,8 @@ import {
     ArrowLeft,
     Clock,
     AlertCircle,
-    BookOpen
+    BookOpen,
+    Star
 } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -25,7 +26,18 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
     // Calculate global average from all completed reviews
     const ratedEnrollments = enrollments.filter((e: any) => e.trainingRating > 0);
     const averageRating = ratedEnrollments.length > 0
-        ? (ratedEnrollments.reduce((acc: number, curr: any) => acc + (curr.trainingRating || 0), 0) / ratedEnrollments.length).toFixed(1)
+        ? (ratedEnrollments.reduce((acc: number, e: any) => {
+            const scores = [
+                e.preTrainingRating,
+                e.postTrainingRating,
+                e.trainingRating,
+                e.contentRating,
+                e.trainerRating,
+                e.materialRating
+            ].filter(s => s !== null && s !== undefined);
+            const userAvg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+            return acc + userAvg;
+        }, 0) / ratedEnrollments.length).toFixed(1)
         : '0.0';
 
     try {
@@ -70,7 +82,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                             <h3 className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-2">Training Average</h3>
                             <div className="flex items-center gap-3">
-                                <span className="text-2xl">⭐</span>
+                                <span className="text-2xl"><Star size={24} className="text-yellow-500" /></span>
                                 <span className="text-3xl font-black text-slate-800">{averageRating}</span>
                                 <span className="text-sm font-medium text-slate-400 self-end mb-1">/ 5.0</span>
                             </div>
@@ -92,66 +104,79 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                     <tr>
                                         <th className="px-6 py-4 font-bold text-slate-600">Employee</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Status</th>
-                                        <th className="px-6 py-4 font-bold text-slate-600">L1 Rating (User)</th>
+                                        <th className="px-6 py-4 font-bold text-slate-600">Feedback Rating</th>
+                                        <th className="px-6 py-4 font-bold text-slate-600">Post Feedback Assessment</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Manager Review</th>
-                                        <th className="px-6 py-4 font-bold text-slate-600">L3 Rating (Mgr)</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
-                                    {enrollments.map((e: any) => (
-                                        <tr key={e.id} className="hover:bg-slate-50/50 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="font-bold text-slate-900">{e.employeeName}</div>
-                                                <div className="text-xs text-slate-500">{e.employeeEmail}</div>
-                                                <div className="text-[10px] text-slate-400 mt-0.5">{e.empId || 'No ID'}</div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusStyles(e.status)}`}>
-                                                    {e.status === 'Completed' ? <CheckCircle2 size={12} /> :
-                                                        e.status === 'Pending Manager' ? <Clock size={12} /> :
-                                                            <AlertCircle size={12} />}
-                                                    {e.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {e.trainingRating ? (
-                                                    <div className="flex items-center gap-1 font-bold text-slate-700">
-                                                        <span className="text-amber-500">★</span> {e.trainingRating}/5
-                                                        <span className="text-slate-400 text-xs font-normal ml-1">
-                                                            (Pre: {e.preTrainingRating} → Post: {e.postTrainingRating})
-                                                        </span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400 italic">Pending</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="max-w-xs">
-                                                    <div className="font-medium text-slate-800 text-xs mb-1">
-                                                        {e.managerName || 'Manager'}
-                                                        <span className="text-slate-400 font-normal"> ({e.managerEmail})</span>
-                                                    </div>
-                                                    {e.managerComment ? (
-                                                        <div className="text-slate-600 text-xs italic bg-slate-50 p-2 rounded border border-slate-100">
-                                                            "{e.managerComment}"
+                                    {enrollments.map((e: any) => {
+                                        // Calculate Feedback Rating (Average of 6 fields)
+                                        const feedbackScores = [
+                                            e.preTrainingRating,
+                                            e.postTrainingRating,
+                                            e.trainingRating,
+                                            e.contentRating,
+                                            e.trainerRating,
+                                            e.materialRating
+                                        ].filter(s => s !== null && s !== undefined);
+
+                                        const feedbackAverage = feedbackScores.length > 0
+                                            ? (feedbackScores.reduce((a, b) => a + b, 0) / feedbackScores.length).toFixed(1)
+                                            : null;
+
+                                        return (
+                                            <tr key={e.id} className="hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="font-bold text-slate-900">{e.employeeName}</div>
+                                                    <div className="text-xs text-slate-500">{e.employeeEmail}</div>
+                                                    <div className="text-[10px] text-slate-400 mt-0.5">{e.empId || 'No ID'}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusStyles(e.status)}`}>
+                                                        {e.status === 'Completed' ? <CheckCircle2 size={12} /> :
+                                                            e.status === 'Pending Manager' ? <Clock size={12} /> :
+                                                                <AlertCircle size={12} />}
+                                                        {e.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {feedbackAverage ? (
+                                                        <div className="flex items-center gap-1 font-bold text-slate-700">
+                                                            <span className="text-amber-500"><Star size={12} /></span> {feedbackAverage}/5
                                                         </div>
                                                     ) : (
-                                                        <span className="text-slate-300 text-xs">- No comments -</span>
+                                                        <span className="text-slate-400 italic">Pending</span>
                                                     )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {e.averageRating ? (
-                                                    <div className="flex flex-col">
-                                                        <span className="font-bold text-slate-800 text-lg">{e.averageRating.toFixed(1)}</span>
-                                                        <span className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Average</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {e.averageRating ? (
+                                                        <div className="flex flex-col">
+                                                            <span className="font-bold text-slate-800 text-lg">{e.averageRating.toFixed(1)}</span>
+                                                            <span className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Average</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-300">-</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="max-w-xs">
+                                                        <div className="font-medium text-slate-800 text-xs mb-1">
+                                                            {e.managerName || 'Manager'}
+                                                            <span className="text-slate-400 font-normal"> ({e.managerEmail})</span>
+                                                        </div>
+                                                        {e.managerComment ? (
+                                                            <div className="text-slate-600 text-xs italic bg-slate-50 p-2 rounded border border-slate-100">
+                                                                "{e.managerComment}"
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-slate-300 text-xs">- No comments -</span>
+                                                        )}
                                                     </div>
-                                                ) : (
-                                                    <span className="text-slate-300">-</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
                                     {enrollments.length === 0 && (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">

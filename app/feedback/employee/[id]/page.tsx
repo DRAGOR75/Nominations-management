@@ -2,7 +2,7 @@ import { db } from '@/lib/db';
 import { submitEmployeeFeedback } from '@/app/actions';
 import { redirect } from 'next/navigation';
 
-// 🟢 FIX STEP 1: Move this component OUTSIDE the main function
+
 const RatingQuestion = ({ label, name }: { label: string; name: string }) => (
     <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
         <label className="block text-slate-800 font-medium mb-3">{label}</label>
@@ -21,7 +21,7 @@ const RatingQuestion = ({ label, name }: { label: string; name: string }) => (
     </div>
 );
 
-// 🟢 FIX STEP 2: Main component stays clean
+
 export default async function EmployeeFeedbackPage({ params }: { params: Promise<{ id: string }> }) {
 
     const { id } = await params;
@@ -52,7 +52,7 @@ export default async function EmployeeFeedbackPage({ params }: { params: Promise
                     <input type="hidden" name="enrollmentId" value={id} />
 
                     <div className="space-y-4">
-                        {/* Now these work perfectly because the component is defined outside */}
+
                         <RatingQuestion name="q1" label="Q1. This program was relevant and useful for my current work." />
                         <RatingQuestion name="q2" label="Q2. I am able to apply most of the knowledge/skills at my workplace." />
                         <RatingQuestion name="q3" label="Q3. I am able to do my job better after the training." />

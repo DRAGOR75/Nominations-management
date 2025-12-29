@@ -15,14 +15,13 @@ import {
     UserCheck,
     PlusCircle,
     QrCode,
-    LogOut,
     Download
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { sendFeedbackEmails } from '@/app/actions';
 import { AddParticipantModal } from '@/components/AddParticipantModal';
 import TrainerManager from '@/components/admin/TrainerManager';
 import CreateSessionModal from '@/components/admin/CreateSessionModal';
-import SignOutButton from "@/components/auth/SignOutButton";
 
 type Session = {
     id: string;
@@ -55,6 +54,7 @@ export default function DashboardClient({
     initialPendingReviews
 }: DashboardClientProps) {
     const [date, setDate] = useState<any>(new Date());
+    const router = useRouter();
 
     const sessions = initialSessions;
     const trainers = initialTrainers;
@@ -78,26 +78,28 @@ export default function DashboardClient({
 
     const tileContent = ({ date, view }: { date: Date; view: string }) => {
         if (view === 'month') {
-            // Check for Level 3 Feedback Date
-            const hasFeedbackTrigger = sessions.some(s =>
-                s.feedbackCreationDate && isSameDay(date, s.feedbackCreationDate)
+            const events: { color: string; title: string }[] = [];
+
+            // Check for PFA Dates
+            const pfaSessions = sessions.filter(s =>
+                s.feedbackCreationDate && isSameDay(date, new Date(s.feedbackCreationDate))
             );
+            pfaSessions.forEach(() => events.push({ color: 'bg-red-500', title: 'Post Feedback Assessment' }));
 
-            // Check for Session End Date
-            const hasSessionEnd = sessions.some(s => isSameDay(date, s.endDate));
+            // Check for Session End Dates
+            const endSessions = sessions.filter(s => isSameDay(date, new Date(s.endDate)));
+            endSessions.forEach(() => events.push({ color: 'bg-purple-600', title: 'Training End Date' }));
 
-            if (hasFeedbackTrigger) {
+            if (events.length > 0) {
                 return (
-                    <div className="flex justify-center mt-1">
-                        <div className="h-1.5 w-1.5 bg-red-600 rounded-full" title="Post Feedback Assesment"></div>
-                    </div>
-                );
-            }
-
-            if (hasSessionEnd) {
-                return (
-                    <div className="flex justify-center mt-1">
-                        <div className="h-1.5 w-1.5 bg-blue-400 rounded-full" title="Training End Date"></div>
+                    <div className="flex flex-col gap-0.5 mt-1 w-full px-1">
+                        {events.map((evt, idx) => (
+                            <div
+                                key={idx}
+                                className={`h-1 w-full rounded-full ${evt.color}`}
+                                title={evt.title}
+                            />
+                        ))}
                     </div>
                 );
             }
@@ -120,12 +122,20 @@ export default function DashboardClient({
         const img = new Image();
 
         img.onload = () => {
-            canvas.width = img.width + 40; // Add padding
-            canvas.height = img.height + 40;
+            const scale = 3; // size of the QR code on Download
+            const padding = 40; // Maintain generous padding
+
+            canvas.width = (img.width * scale) + (padding * 2);
+            canvas.height = (img.height * scale) + (padding * 2);
+
             if (ctx) {
+                ctx.imageSmoothingEnabled = false; // Keep edges sharp
                 ctx.fillStyle = "white";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 20, 20);
+
+                // Draw scaled image
+                ctx.drawImage(img, padding, padding, img.width * scale, img.height * scale);
+
                 const pngFile = canvas.toDataURL("image/png");
 
                 const downloadLink = document.createElement("a");
@@ -156,16 +166,16 @@ export default function DashboardClient({
                                 onChange={setDate}
                                 value={date}
                                 tileContent={tileContent}
-                                className="rounded-xl border-none w-full p-2"
+                                className="w-full"
                             />
                             <div className="flex gap-4 mt-4 text-xs justify-center">
                                 <div className="flex items-center gap-1">
-                                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                    <div className="w-4 h-1 bg-purple-600 rounded-full"></div>
                                     <span className="text-slate-500">Session End</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-                                    <span className="text-slate-500">Post Feedback Assesment</span>
+                                    <div className="w-4 h-1 bg-red-500 rounded-full"></div>
+                                    <span className="text-slate-500">PFA Deadline</span>
                                 </div>
                             </div>
                         </div>
@@ -242,14 +252,17 @@ export default function DashboardClient({
                         ) : (
                             <div className="space-y-4">
                                 {filteredSessions.map((t) => (
-                                    <div key={t.id} className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-blue-300 hover:shadow-md transition-all group">
+                                    <div
+                                        key={t.id}
+                                        onClick={() => router.push(`/admin/dashboard/session/${t.id}`)}
+                                        className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-blue-300 hover:shadow-md transition-all group cursor-pointer relative"
+                                    >
                                         <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                                             <div className="flex-1 space-y-4">
                                                 <div className="flex justify-between items-start">
+                                                    {/* Changed from Link to h3 with hover effect */}
                                                     <h3 className="font-black text-xl text-slate-900 tracking-tight group-hover:text-blue-700 transition-colors">
-                                                        <a href={`/admin/dashboard/session/${t.id}`} className="hover:underline">
-                                                            {t.programName}
-                                                        </a>
+                                                        {t.programName}
                                                     </h3>
                                                     <span className={`flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-tighter ${t.emailsSent ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                                         {t.emailsSent ? <CheckCircle2 size={12} /> : <Clock size={12} />}
@@ -269,7 +282,7 @@ export default function DashboardClient({
                                                     {t.feedbackCreationDate && (
                                                         <div className="flex items-center gap-2 text-red-600">
                                                             <CalendarIcon size={16} />
-                                                            <span>Post Feedback Assessment: {new Date(t.feedbackCreationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                            <span>PFA: {new Date(t.feedbackCreationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                                                         </div>
                                                     )}
                                                     <div className="flex items-center gap-2">
@@ -278,13 +291,13 @@ export default function DashboardClient({
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-wrap gap-2 pt-2">
+                                                <div className="flex flex-wrap gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
                                                     <AddParticipantModal sessionId={t.id} />
                                                     <button
-                                                        onClick={async () => {
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation(); // Stop click from triggering card nav
                                                             if (!confirm("Send feedback emails to all participants?")) return;
                                                             await sendFeedbackEmails(t.id);
-                                                            // window.location.reload(); // Not needed if server action revalidates
                                                         }}
                                                         disabled={t.emailsSent}
                                                         className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all ${t.emailsSent
@@ -293,18 +306,21 @@ export default function DashboardClient({
                                                             }`}
                                                     >
                                                         <Mail size={14} />
-                                                        {t.emailsSent ? 'Feedback Sent' : 'Trigger Level 3 Emails'}
+                                                        {t.emailsSent ? 'PFA Emails Sent' : 'Trigger PFA Emails'}
                                                     </button>
                                                 </div>
                                             </div>
 
                                             {/* QR Code */}
-                                            <div className="flex flex-col items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                            <div
+                                                className="flex flex-col items-center bg-slate-50 p-4 rounded-2xl border border-slate-100"
+                                                onClick={(e) => e.stopPropagation()} // Stop click here too
+                                            >
                                                 <div className="bg-white p-2 rounded-lg shadow-sm">
                                                     <QRCode
                                                         id={`qr-${t.id}`}
                                                         value={`https://templtrainingportal.vercel.app/join/${t.id}`}
-                                                        size={80}
+                                                        size={100}
                                                     />
                                                 </div>
                                                 <div className="flex flex-col items-center gap-2 mt-3">
@@ -312,11 +328,15 @@ export default function DashboardClient({
                                                         href={`/join/${t.id}`}
                                                         target="_blank"
                                                         className="flex items-center gap-1 text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 tracking-widest"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     >
                                                         Live Link <ExternalLink size={10} />
                                                     </a>
                                                     <button
-                                                        onClick={() => downloadQRCode(t.id, t.programName)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            downloadQRCode(t.id, t.programName);
+                                                        }}
                                                         className="flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors"
                                                     >
                                                         <Download size={10} /> Download

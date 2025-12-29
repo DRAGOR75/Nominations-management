@@ -89,7 +89,7 @@ export async function sendFeedbackRequestEmail(
 
   const html = `
     <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-      <h2 style="color: #2e7d32;">Training Feedback Request</h2>
+      <h2 style="color: #2e7d32;">Post Feedback Assessment</h2>
       <p>Dear <strong>${employeeName}</strong>,</p>
       <p>Thank you for participating in the <strong>${programName}</strong> program.</p>
       <p>Your feedback is valuable to us. Please click the button below to submit your evaluation:</p>
@@ -98,5 +98,5 @@ export async function sendFeedbackRequestEmail(
       <small style="color: #888;">This is an automated message from the Thriveni Training Management System.</small>
     </div>`;
 
-  return await sendEmail({ to: employeeEmail, subject: `Feedback Required: ${programName}`, html });
+  return await sendEmail({ to: employeeEmail, subject: `Action Required: Post Feedback Assessment for ${programName}`, html });
 }

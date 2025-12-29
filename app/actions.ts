@@ -25,8 +25,8 @@ export async function getDashboardData() {
         });
 
         return { sessions, pendingCount };
-    } catch (error) {
-        console.error("Dashboard Data Error:", error);
+    } catch (error: any) {
+        console.error("Dashboard Data Error:", error?.message || error);
         return { sessions: [], pendingCount: 0 };
     }
 }
@@ -187,10 +187,10 @@ export async function sendFeedbackEmails(sessionId: string) {
             }
         }
 
-        // await db.trainingSession.update({
-        //     where: { id: sessionId },
-        //     data: { emailsSent: true }
-        // });
+        await db.trainingSession.update({
+            where: { id: sessionId },
+            data: { emailsSent: true }
+        });
 
         revalidatePath('/admin/dashboard');
         return { success: true, message: `Emails sent to ${count} employees.` };
