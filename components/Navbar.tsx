@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Menu, X, Home, ShieldCheck, FileText, LayoutDashboard } from 'lucide-react';
 import SignOutButton from './auth/SignOutButton';
 import { Session } from 'next-auth';
@@ -10,6 +11,12 @@ import { Session } from 'next-auth';
 export default function Navbar({ session }: { session: Session | null }) {
     const [isOpen, setIsOpen] = useState(false);
     const isLoggedIn = !!session?.user;
+    const pathname = usePathname();
+
+    // Hide Navbar on Feedback & Join Pages
+    if (pathname?.startsWith('/join') || pathname?.startsWith('/feedback')) {
+        return null;
+    }
 
     return (
         <nav className="bg-white shadow-md border-b border-slate-200 sticky top-0 z-50">
