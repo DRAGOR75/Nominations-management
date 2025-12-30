@@ -54,7 +54,18 @@ export default function DashboardClient({
     initialPendingReviews
 }: DashboardClientProps) {
     const [date, setDate] = useState<any>(new Date());
+    const [enabledSessionIds, setEnabledSessionIds] = useState<Set<string>>(new Set());
     const router = useRouter();
+
+    const toggleSessionEmail = (sessionId: string) => {
+        const next = new Set(enabledSessionIds);
+        if (next.has(sessionId)) {
+            next.delete(sessionId);
+        } else {
+            next.add(sessionId);
+        }
+        setEnabledSessionIds(next);
+    };
 
     const sessions = initialSessions;
     const trainers = initialTrainers;
@@ -238,11 +249,13 @@ export default function DashboardClient({
 
                     {/* Sessions List */}
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-                            <QrCode className="text-blue-700" size={20} />
-                            <h2 className="text-lg font-bold text-slate-900">
-                                {date ? `Sessions for ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'Active Sessions'}
-                            </h2>
+                        <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 justify-between flex-wrap">
+                            <div className="flex items-center gap-2">
+                                <QrCode className="text-blue-700" size={20} />
+                                <h2 className="text-lg font-bold text-slate-900">
+                                    {date ? `Sessions for ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'Active Sessions'}
+                                </h2>
+                            </div>
                         </div>
 
                         {filteredSessions.length === 0 ? (
@@ -291,16 +304,34 @@ export default function DashboardClient({
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-wrap gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
+                                                <div className="flex flex-col gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
+                                                    {/* Per-Session Safety Toggle */}
+                                                    {!t.emailsSent && (
+                                                        <div className="flex items-center gap-2 self-start">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    toggleSessionEmail(t.id);
+                                                                }}
+                                                                className={`w-8 h-4 rounded-full transition-colors relative focus:outline-none ${enabledSessionIds.has(t.id) ? 'bg-blue-600' : 'bg-slate-300'}`}
+                                                            >
+                                                                <div className={`w-3 h-3 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-200 ease-in-out ${enabledSessionIds.has(t.id) ? 'left-4.5' : 'left-0.5'}`} style={{ left: enabledSessionIds.has(t.id) ? '18px' : '2px' }} />
+                                                            </button>
+                                                            <span className={`text-[10px] font-bold uppercase tracking-wider ${enabledSessionIds.has(t.id) ? 'text-blue-700' : 'text-slate-400'}`}>
+                                                                Enable Email
+                                                            </span>
+                                                        </div>
+                                                    )}
 
                                                     <button
                                                         onClick={async (e) => {
                                                             e.stopPropagation(); // Stop click from triggering card nav
                                                             if (!confirm("Send feedback emails to all participants?")) return;
                                                             await sendFeedbackEmails(t.id);
+                                                            // Optionally turn off toggle after sending? strictly user didn't ask, but good UX.
                                                         }}
-                                                        disabled={t.emailsSent}
-                                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all ${t.emailsSent
+                                                        disabled={t.emailsSent || !enabledSessionIds.has(t.id)}
+                                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all w-fit ${t.emailsSent || !enabledSessionIds.has(t.id)
                                                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                                             : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md active:scale-95'
                                                             }`}

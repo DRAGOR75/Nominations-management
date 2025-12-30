@@ -102,9 +102,9 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                     <tr>
                                         <th className="px-6 py-4 font-bold text-slate-600">Employee</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Feedback Rating</th>
+                                        <th className="px-6 py-4 font-bold text-slate-600 w-64">Additional Comments</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Post training (30 days) performance feedback Status</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Post training (30 days) performance feedback</th>
-                                        <th className="px-6 py-4 font-bold text-slate-600 w-64">Additional Comments</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Manager Review</th>
                                     </tr>
                                 </thead>
@@ -139,24 +139,6 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusStyles(e.status)}`}>
-                                                        {e.status === 'Completed' ? <CheckCircle2 size={12} /> :
-                                                            e.status === 'Pending Manager' ? <Clock size={12} /> :
-                                                                <AlertCircle size={12} />}
-                                                        {e.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    {e.averageRating ? (
-                                                        <div className="flex flex-col">
-                                                            <span className="font-bold text-slate-800 text-lg">{e.averageRating.toFixed(1)}</span>
-                                                            <span className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Average</span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-slate-300">-</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4">
                                                     <div className="flex flex-col gap-2 max-w-xs text-xs">
                                                         {e.topicsLearned && (
                                                             <div>
@@ -180,6 +162,24 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                                             <span className="text-slate-300 italic">- No comments -</span>
                                                         )}
                                                     </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusStyles(e.status)}`}>
+                                                        {e.status === 'Completed' ? <CheckCircle2 size={12} /> :
+                                                            e.status === 'Pending Manager' ? <Clock size={12} /> :
+                                                                <AlertCircle size={12} />}
+                                                        {e.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {e.averageRating ? (
+                                                        <div className="flex flex-col">
+                                                            <span className="font-bold text-slate-800 text-lg">{e.averageRating.toFixed(1)}</span>
+                                                            <span className="text-[10px] text-slate-400 uppercase tracking-wide font-bold">Average</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-300">-</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="max-w-xs">

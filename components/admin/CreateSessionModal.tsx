@@ -101,18 +101,13 @@ export default function CreateSessionModal({ trainers }: { trainers: any[] }) {
                         </div>
                     </div>
 
-                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                        <label className="block text-xs font-bold text-blue-800 mb-1">
-                            Post training (30 days) performance feedback Trigger Date
-                        </label>
-                        <input
-                            id="feedbackCreationDate"
-                            name="feedbackCreationDate"
-                            required
-                            type="date"
-                            className="w-full p-2 border border-blue-200 rounded text-sm"
-                        />
-                    </div>
+                    {/* Hidden Field for Logic Continuity */}
+                    <input
+                        id="feedbackCreationDate"
+                        name="feedbackCreationDate"
+                        required
+                        type="hidden"
+                    />
 
                     <div className="pt-2 flex justify-end gap-3">
                         <button type="button" onClick={() => setIsOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium">Cancel</button>
