@@ -44,7 +44,7 @@ export default async function EmployeeFeedbackPage({ params }: { params: Promise
         <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
             <div className="max-w-2xl w-full bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
                 <div className="bg-slate-900 p-6 text-white">
-                    <h1 className="text-2xl font-bold">Post-Training Effectiveness</h1>
+                    <h1 className="text-2xl font-bold">Post training (30 days) performance feedback</h1>
                     <p className="opacity-80 text-sm mt-1">Please rate the impact of: <span className="font-bold text-blue-300">{enrollment.session.programName}</span></p>
                 </div>
 

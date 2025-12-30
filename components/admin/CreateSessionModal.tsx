@@ -103,7 +103,7 @@ export default function CreateSessionModal({ trainers }: { trainers: any[] }) {
 
                     <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
                         <label className="block text-xs font-bold text-blue-800 mb-1">
-                            PFA Trigger Date (Post Feedback Assessment)
+                            Post training (30 days) performance feedback Trigger Date
                         </label>
                         <input
                             id="feedbackCreationDate"

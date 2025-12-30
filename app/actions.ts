@@ -118,6 +118,7 @@ export async function submitEmployeeFeedback(formData: FormData) {
         });
 
         // 2. Send Email to Manager
+        // Dynamic URL for flexible testing (Localhost vs Prod)
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://templtrainingportal.vercel.app';
         const managerLink = `${baseUrl}/feedback/manager/${enrollmentId}`;
 
@@ -125,7 +126,7 @@ export async function submitEmployeeFeedback(formData: FormData) {
             to: updatedEnrollment.managerEmail,
             subject: `Action Required: Feedback Review for ${updatedEnrollment.employeeName}`,
             html: `
-            <h2>Training Effectiveness Review</h2>
+            <h2>Post training (30 days) performance feedback</h2>
             <p><strong>Employee:</strong> ${updatedEnrollment.employeeName}</p>
             <p><strong>Program:</strong> ${updatedEnrollment.session.programName}</p>
             <p>The employee has submitted their post-training feedback.</p>

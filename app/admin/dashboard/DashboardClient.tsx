@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { sendFeedbackEmails } from '@/app/actions';
-import { AddParticipantModal } from '@/components/AddParticipantModal';
+
 import TrainerManager from '@/components/admin/TrainerManager';
 import CreateSessionModal from '@/components/admin/CreateSessionModal';
 
@@ -84,7 +84,7 @@ export default function DashboardClient({
             const pfaSessions = sessions.filter(s =>
                 s.feedbackCreationDate && isSameDay(date, new Date(s.feedbackCreationDate))
             );
-            pfaSessions.forEach(() => events.push({ color: 'bg-red-500', title: 'Post Feedback Assessment' }));
+            pfaSessions.forEach(() => events.push({ color: 'bg-red-500', title: 'Post training (30 days) performance feedback' }));
 
             // Check for Session End Dates
             const endSessions = sessions.filter(s => isSameDay(date, new Date(s.endDate)));
@@ -175,7 +175,7 @@ export default function DashboardClient({
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <div className="w-4 h-1 bg-red-500 rounded-full"></div>
-                                    <span className="text-slate-500">PFA Deadline</span>
+                                    <span className="text-slate-500">Post training (30 days) performance feedback Deadline</span>
                                 </div>
                             </div>
                         </div>
@@ -282,7 +282,7 @@ export default function DashboardClient({
                                                     {t.feedbackCreationDate && (
                                                         <div className="flex items-center gap-2 text-red-600">
                                                             <CalendarIcon size={16} />
-                                                            <span>PFA: {new Date(t.feedbackCreationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                            <span>Post training (30 days) performance feedback: {new Date(t.feedbackCreationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                                                         </div>
                                                     )}
                                                     <div className="flex items-center gap-2">
@@ -292,7 +292,7 @@ export default function DashboardClient({
                                                 </div>
 
                                                 <div className="flex flex-wrap gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-                                                    <AddParticipantModal sessionId={t.id} />
+
                                                     <button
                                                         onClick={async (e) => {
                                                             e.stopPropagation(); // Stop click from triggering card nav
@@ -306,7 +306,7 @@ export default function DashboardClient({
                                                             }`}
                                                     >
                                                         <Mail size={14} />
-                                                        {t.emailsSent ? 'PFA Emails Sent' : 'Trigger PFA Emails'}
+                                                        {t.emailsSent ? 'Post training (30 days) performance feedback Emails Sent' : 'Send Post training (30 days) performance feedback Emails'}
                                                     </button>
                                                 </div>
                                             </div>

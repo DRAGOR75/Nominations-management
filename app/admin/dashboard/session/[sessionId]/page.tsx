@@ -28,8 +28,6 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
     const averageRating = ratedEnrollments.length > 0
         ? (ratedEnrollments.reduce((acc: number, e: any) => {
             const scores = [
-                e.preTrainingRating,
-                e.postTrainingRating,
                 e.trainingRating,
                 e.contentRating,
                 e.trainerRating,
@@ -103,9 +101,10 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                 <thead className="bg-slate-50 border-b border-slate-200">
                                     <tr>
                                         <th className="px-6 py-4 font-bold text-slate-600">Employee</th>
-                                        <th className="px-6 py-4 font-bold text-slate-600">Status</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Feedback Rating</th>
-                                        <th className="px-6 py-4 font-bold text-slate-600">Post Feedback Assessment</th>
+                                        <th className="px-6 py-4 font-bold text-slate-600">Post training (30 days) performance feedback Status</th>
+                                        <th className="px-6 py-4 font-bold text-slate-600">Post training (30 days) performance feedback</th>
+                                        <th className="px-6 py-4 font-bold text-slate-600 w-64">Additional Comments</th>
                                         <th className="px-6 py-4 font-bold text-slate-600">Manager Review</th>
                                     </tr>
                                 </thead>
@@ -113,8 +112,6 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                     {enrollments.map((e: any) => {
                                         // Calculate Feedback Rating (Average of 6 fields)
                                         const feedbackScores = [
-                                            e.preTrainingRating,
-                                            e.postTrainingRating,
                                             e.trainingRating,
                                             e.contentRating,
                                             e.trainerRating,
@@ -133,14 +130,6 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                                     <div className="text-[10px] text-slate-400 mt-0.5">{e.empId || 'No ID'}</div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusStyles(e.status)}`}>
-                                                        {e.status === 'Completed' ? <CheckCircle2 size={12} /> :
-                                                            e.status === 'Pending Manager' ? <Clock size={12} /> :
-                                                                <AlertCircle size={12} />}
-                                                        {e.status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
                                                     {feedbackAverage ? (
                                                         <div className="flex items-center gap-1 font-bold text-slate-700">
                                                             <span className="text-amber-500"><Star size={12} /></span> {feedbackAverage}/5
@@ -148,6 +137,14 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                                     ) : (
                                                         <span className="text-slate-400 italic">Pending</span>
                                                     )}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusStyles(e.status)}`}>
+                                                        {e.status === 'Completed' ? <CheckCircle2 size={12} /> :
+                                                            e.status === 'Pending Manager' ? <Clock size={12} /> :
+                                                                <AlertCircle size={12} />}
+                                                        {e.status}
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {e.averageRating ? (
@@ -158,6 +155,31 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                                                     ) : (
                                                         <span className="text-slate-300">-</span>
                                                     )}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col gap-2 max-w-xs text-xs">
+                                                        {e.topicsLearned && (
+                                                            <div>
+                                                                <span className="font-bold text-slate-600 block">Topics:</span>
+                                                                <p className="text-slate-500 line-clamp-3 hover:line-clamp-none transition-all">{e.topicsLearned}</p>
+                                                            </div>
+                                                        )}
+                                                        {e.actionPlan && (
+                                                            <div>
+                                                                <span className="font-bold text-slate-600 block">Action Plan:</span>
+                                                                <p className="text-slate-500 line-clamp-3 hover:line-clamp-none transition-all">{e.actionPlan}</p>
+                                                            </div>
+                                                        )}
+                                                        {e.suggestions && (
+                                                            <div>
+                                                                <span className="font-bold text-slate-600 block">Suggestions:</span>
+                                                                <p className="text-slate-500 line-clamp-3 hover:line-clamp-none transition-all">{e.suggestions}</p>
+                                                            </div>
+                                                        )}
+                                                        {!e.topicsLearned && !e.actionPlan && !e.suggestions && (
+                                                            <span className="text-slate-300 italic">- No comments -</span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="max-w-xs">
