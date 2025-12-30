@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/auth"; // Updated: Import auth
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default async function RootLayout({
                 {/* Updated: Pass session to Navbar */}
                 <Navbar session={session} />
                 {children}
+                <SpeedInsights />
             </body>
         </html>
     );
