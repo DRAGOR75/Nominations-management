@@ -133,8 +133,8 @@ export async function submitEmployeeFeedback(formData: FormData) {
         });
 
         // 2. Send Email to Manager
-        // Dynamic URL for flexible testing (Localhost vs Prod)
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://templtrainingportal.vercel.app';
+        // Hardcoded Production URL for reliability
+        const baseUrl = 'https://templtrainingportal.vercel.app';
         const managerLink = `${baseUrl}/feedback/manager/${enrollmentId}`;
 
         await sendEmail({

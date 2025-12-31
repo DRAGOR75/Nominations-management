@@ -55,8 +55,8 @@ export async function sendApprovalEmail(
   justification: string,
   nominationId: string
 ) {
-  // Dynamic URL: Uses env var if set (e.g., localhost in dev), otherwise falls back to production
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://templtrainingportal.vercel.app';
+  // Hardcoded Production URL for reliability
+  const baseUrl = 'https://templtrainingportal.vercel.app';
   const approvalLink = `${baseUrl}/nominations/manager/${nominationId}`;
 
   const html = `
@@ -85,8 +85,8 @@ export async function sendFeedbackRequestEmail(
   programName: string,
   enrollmentId: string
 ) {
-  // Dynamic URL: Uses env var if set (e.g., localhost in dev), otherwise falls back to production
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://templtrainingportal.vercel.app';
+  // Hardcoded Production URL for reliability
+  const baseUrl = 'https://templtrainingportal.vercel.app';
   const feedbackLink = `${baseUrl}/feedback/employee/${enrollmentId}`;
 
   const html = `

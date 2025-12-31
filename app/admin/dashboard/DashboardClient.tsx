@@ -281,7 +281,7 @@ export default function DashboardClient({
                                             className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-blue-300 hover:shadow-md transition-all group cursor-pointer relative"
                                         >
                                             {/* ROW 1: Program Name and Dates - Moved to Top Level */}
-                                            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 pb-4 border-b border-slate-100">
+                                            <div className="flex flex-row justify-between items-center gap-4 pb-4 border-b border-slate-100">
                                                 <h3 className="font-black text-xl text-slate-900 tracking-tight group-hover:text-blue-700 transition-colors">
                                                     {t.programName}
                                                 </h3>
