@@ -10,9 +10,7 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-// ==========================================
-// EXISTING TRAINING SYSTEM (UNCHANGED)
-// ==========================================
+
 
 // 1. Training Sessions
 model TrainingSession {
@@ -24,6 +22,9 @@ model TrainingSession {
   feedbackCreationDate DateTime?   @map("feedback_creation_date")
   templateType         String      @default("Technical") @map("template_type")
   emailsSent           Boolean     @default(false) @map("emails_sent")
+  feedbackReminderSent Boolean     @default(false) @map("feedback_reminder_sent")
+  sendFeedbackAutomatically Boolean @default(false) @map("send_feedback_automatically")
+
   createdAt            DateTime    @default(now()) @map("created_at")
   
   enrollments          Enrollment[]
