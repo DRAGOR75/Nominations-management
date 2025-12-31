@@ -31,6 +31,21 @@ export async function getDashboardData() {
     }
 }
 
+// 1.b TOGGLE FEEDBACK AUTOMATION
+export async function toggleFeedbackAutomation(sessionId: string, isEnabled: boolean) {
+    try {
+        await db.trainingSession.update({
+            where: { id: sessionId },
+            data: { sendFeedbackAutomatically: isEnabled },
+        });
+        revalidatePath('/admin/dashboard');
+        return { success: true };
+    } catch (error) {
+        console.error("Error toggling automation:", error);
+        return { success: false, error: "Failed to update settings" };
+    }
+}
+
 // 2. NOMINATION LOGIC
 export async function getUpcomingSessions() {
     try {

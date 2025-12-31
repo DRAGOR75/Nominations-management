@@ -31,6 +31,7 @@ type Session = {
     endDate: Date;
     feedbackCreationDate?: Date | null;
     emailsSent: boolean;
+    sendFeedbackAutomatically: boolean;
     enrollments: any[];
 };
 
@@ -54,17 +55,22 @@ export default function DashboardClient({
     initialPendingReviews
 }: DashboardClientProps) {
     const [date, setDate] = useState<any>(new Date());
-    const [enabledSessionIds, setEnabledSessionIds] = useState<Set<string>>(new Set());
     const router = useRouter();
 
-    const toggleSessionEmail = (sessionId: string) => {
-        const next = new Set(enabledSessionIds);
-        if (next.has(sessionId)) {
-            next.delete(sessionId);
-        } else {
-            next.add(sessionId);
+    const toggleSessionEmail = async (sessionId: string, currentStatus: boolean) => {
+        // Optimistic / Server Action Call
+        // We import the action dynamically or pass it? Imports from 'app/actions' in client components work if it's "use server"
+        // But better to import at top level.
+        // I need to import { toggleFeedbackAutomation } from '@/app/actions';
+        // But first let's just use the logic here.
+
+        try {
+            const { toggleFeedbackAutomation } = await import('@/app/actions');
+            await toggleFeedbackAutomation(sessionId, !currentStatus);
+            router.refresh();
+        } catch (error) {
+            alert("Failed to update settings");
         }
-        setEnabledSessionIds(next);
     };
 
     const sessions = initialSessions;
@@ -161,7 +167,7 @@ export default function DashboardClient({
 
     return (
         <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-900">
-            {/* Navbar Removed - Moved to Global Navbar */}
+
 
             <main className="flex-1 p-6 md:p-8 flex flex-col lg:flex-row gap-8">
                 {/* LEFT COLUMN */}
@@ -264,119 +270,171 @@ export default function DashboardClient({
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {filteredSessions.map((t) => (
-                                    <div
-                                        key={t.id}
-                                        onClick={() => router.push(`/admin/dashboard/session/${t.id}`)}
-                                        className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-blue-300 hover:shadow-md transition-all group cursor-pointer relative"
-                                    >
-                                        <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                                            <div className="flex-1 space-y-4">
-                                                <div className="flex justify-between items-start">
-                                                    {/* Changed from Link to h3 with hover effect */}
-                                                    <h3 className="font-black text-xl text-slate-900 tracking-tight group-hover:text-blue-700 transition-colors">
-                                                        {t.programName}
-                                                    </h3>
-                                                    <span className={`flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-tighter ${t.emailsSent ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                                                        {t.emailsSent ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                                                        {t.emailsSent ? 'Completed' : 'Active'}
-                                                    </span>
-                                                </div>
+                                {filteredSessions.map((t) => {
+                                    const trainingFeedbackCount = t.enrollments.filter((e: any) => e.trainingRating != null).length;
+                                    const postFeedbackCount = t.enrollments.filter((e: any) => e.averageRating != null || e.q1_Relevance != null).length;
 
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-medium text-slate-700">
-                                                    <div className="flex items-center gap-2">
-                                                        <UserCheck size={16} className="text-slate-400" />
-                                                        <span>Trainer: <span className="font-bold">{t.trainerName || 'N/A'}</span></span>
+                                    return (
+                                        <div
+                                            key={t.id}
+                                            onClick={() => router.push(`/admin/dashboard/session/${t.id}`)}
+                                            className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-blue-300 hover:shadow-md transition-all group cursor-pointer relative"
+                                        >
+                                            {/* ROW 1: Program Name and Dates - Moved to Top Level */}
+                                            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 pb-4 border-b border-slate-100">
+                                                <h3 className="font-black text-xl text-slate-900 tracking-tight group-hover:text-blue-700 transition-colors">
+                                                    {t.programName}
+                                                </h3>
+                                                <div className="flex items-center gap-3 text-xs font-semibold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 whitespace-nowrap">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <CalendarIcon size={14} className="text-blue-500" />
+                                                        <span>StartDate: {new Date(t.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <CalendarIcon size={16} className="text-slate-400" />
-                                                        <span>{formatDateRange(t.startDate, t.endDate)}</span>
+                                                    <div className="w-px h-3 bg-slate-300 mx-1"></div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <CalendarIcon size={14} className="text-emerald-500" />
+                                                        <span>EndDate: {new Date(t.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                                     </div>
-                                                    {t.feedbackCreationDate && (
-                                                        <div className="flex items-center gap-2 text-red-600">
-                                                            <CalendarIcon size={16} />
-                                                            <span>Post training (30 days) performance feedback: {new Date(t.feedbackCreationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                                                        </div>
-                                                    )}
-                                                    <div className="flex items-center gap-2">
-                                                        <Users size={16} className="text-slate-400" />
-                                                        <span>{t.enrollments.length} Participants</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex flex-col gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-                                                    {/* Per-Session Safety Toggle */}
-                                                    {!t.emailsSent && (
-                                                        <div className="flex items-center gap-2 self-start">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    toggleSessionEmail(t.id);
-                                                                }}
-                                                                className={`w-8 h-4 rounded-full transition-colors relative focus:outline-none ${enabledSessionIds.has(t.id) ? 'bg-blue-600' : 'bg-slate-300'}`}
-                                                            >
-                                                                <div className={`w-3 h-3 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-200 ease-in-out ${enabledSessionIds.has(t.id) ? 'left-4.5' : 'left-0.5'}`} style={{ left: enabledSessionIds.has(t.id) ? '18px' : '2px' }} />
-                                                            </button>
-                                                            <span className={`text-[10px] font-bold uppercase tracking-wider ${enabledSessionIds.has(t.id) ? 'text-blue-700' : 'text-slate-400'}`}>
-                                                                Enable Email
-                                                            </span>
-                                                        </div>
-                                                    )}
-
-                                                    <button
-                                                        onClick={async (e) => {
-                                                            e.stopPropagation(); // Stop click from triggering card nav
-                                                            if (!confirm("Send feedback emails to all participants?")) return;
-                                                            await sendFeedbackEmails(t.id);
-                                                            // Optionally turn off toggle after sending? strictly user didn't ask, but good UX.
-                                                        }}
-                                                        disabled={t.emailsSent || !enabledSessionIds.has(t.id)}
-                                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all w-fit ${t.emailsSent || !enabledSessionIds.has(t.id)
-                                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                            : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md active:scale-95'
-                                                            }`}
-                                                    >
-                                                        <Mail size={14} />
-                                                        {t.emailsSent ? 'Post training (30 days) performance feedback Emails Sent' : 'Send Post training (30 days) performance feedback Emails'}
-                                                    </button>
                                                 </div>
                                             </div>
 
-                                            {/* QR Code */}
-                                            <div
-                                                className="flex flex-col items-center bg-slate-50 p-4 rounded-2xl border border-slate-100"
-                                                onClick={(e) => e.stopPropagation()} // Stop click here too
-                                            >
-                                                <div className="bg-white p-2 rounded-lg shadow-sm">
-                                                    <QRCode
-                                                        id={`qr-${t.id}`}
-                                                        value={`https://templtrainingportal.vercel.app/join/${t.id}`}
-                                                        size={100}
-                                                    />
+                                            {/* LOWER SECTION: Metrics + QR Code */}
+                                            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                                                <div className="flex-1 space-y-4">
+
+                                                    {/* Unified Grid for Perfect Alignment */}
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 py-2">
+                                                        {/* Left Col: Trainer */}
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="bg-blue-50 p-2 rounded-lg text-blue-600 shrink-0">
+                                                                <UserCheck size={18} />
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Trainer</span>
+                                                                <span className="font-bold text-slate-900 text-sm block">{t.trainerName || 'N/A'}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Right Col: Training Feedback */}
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600 shrink-0">
+                                                                <CheckCircle2 size={18} />
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Training Feedback</span>
+                                                                <span className="font-bold text-slate-900 text-sm block">{trainingFeedbackCount} <span className="text-slate-400 text-xs font-medium">/ {t.enrollments.length} submitted</span></span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Left Col: Enable Button */}
+                                                        <div className="flex flex-wrap items-center gap-3 h-full">
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        toggleSessionEmail(t.id, t.sendFeedbackAutomatically);
+                                                                    }}
+                                                                    className={`w-9 h-5 rounded-full transition-colors relative focus:outline-none shrink-0 ${t.sendFeedbackAutomatically ? 'bg-blue-600' : 'bg-slate-300'}`}
+                                                                >
+                                                                    <div className={`w-3.5 h-3.5 bg-white rounded-full absolute top-[3px] shadow-sm transition-all duration-200 ease-in-out ${t.sendFeedbackAutomatically ? 'left-[18px]' : 'left-[3px]'}`} />
+                                                                </button>
+                                                                <span className={`text-[10px] font-bold uppercase tracking-wider ${t.sendFeedbackAutomatically ? 'text-blue-700' : 'text-slate-400'}`}>
+                                                                    {t.sendFeedbackAutomatically ? 'Auto-Send On' : 'Enable to send Post Training Performance Feedback'}
+                                                                </span>
+                                                            </div>
+                                                            <button
+                                                                onClick={async (e) => {
+                                                                    e.stopPropagation();
+                                                                    if (!confirm("Send feedback emails to all participants?")) return;
+                                                                    await sendFeedbackEmails(t.id);
+                                                                }}
+                                                                disabled={t.emailsSent}
+                                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wide transition-all shrink-0 ${t.emailsSent
+                                                                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                                                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md active:scale-95'
+                                                                    }`}
+                                                            >
+                                                                <Mail size={12} />
+                                                                {t.emailsSent ? 'Sent' : 'Send Manually'}
+                                                            </button>
+                                                        </div>
+
+                                                        {/* Right Col: PFA Date */}
+                                                        <div>
+                                                            {t.feedbackCreationDate ? (
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="bg-red-50 p-2 rounded-lg text-red-600 shrink-0">
+                                                                        <Clock size={18} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Post Feedback Date</span>
+                                                                        <span className="font-bold text-slate-900 text-sm block">{new Date(t.feedbackCreationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex items-center gap-3 opacity-50">
+                                                                    <div className="bg-slate-100 p-2 rounded-lg text-slate-400 shrink-0">
+                                                                        <Clock size={18} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Post Feedback Date</span>
+                                                                        <span className="font-medium text-slate-400 text-sm block">Not Scheduled</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* ROW 4: 30-Day Feedback (Full Width) */}
+                                                    <div className="pt-2 border-t border-slate-100 mt-1">
+                                                        <div className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition-colors -ml-2 -mr-2">
+                                                            <div className="bg-purple-100 p-2 rounded-lg text-purple-600 shrink-0">
+                                                                <Users size={18} />
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-0.5">POST TRAINING (30 DAYS) PERFORMANCE FEEDBACK</span>
+                                                                <span className="font-bold text-slate-900 text-sm">{postFeedbackCount} <span className="text-slate-400 text-xs font-medium">/ {t.enrollments.length} submitted</span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col items-center gap-2 mt-3">
-                                                    <a
-                                                        href={`/join/${t.id}`}
-                                                        target="_blank"
-                                                        className="flex items-center gap-1 text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 tracking-widest"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        Live Link <ExternalLink size={10} />
-                                                    </a>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            downloadQRCode(t.id, t.programName);
-                                                        }}
-                                                        className="flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors"
-                                                    >
-                                                        <Download size={10} /> Download
-                                                    </button>
+
+                                                {/* QR Code */}
+                                                <div
+                                                    className="flex flex-col items-center bg-slate-50 p-4 rounded-2xl border border-slate-100 shrink-0"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <div className="bg-white p-2 rounded-lg shadow-sm">
+                                                        <QRCode
+                                                            id={`qr-${t.id}`}
+                                                            value={`https://templtrainingportal.vercel.app/join/${t.id}`}
+                                                            size={150}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col items-center gap-2 mt-3">
+                                                        <a
+                                                            href={`/join/${t.id}`}
+                                                            target="_blank"
+                                                            className="flex items-center gap-1 text-[10px] font-black uppercase text-blue-600 hover:text-blue-800 tracking-widest"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            Live Link <ExternalLink size={10} />
+                                                        </a>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                downloadQRCode(t.id, t.programName);
+                                                            }}
+                                                            className="flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                                                        >
+                                                            <Download size={10} /> Download
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

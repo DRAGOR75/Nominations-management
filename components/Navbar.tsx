@@ -45,6 +45,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                                     fill
                                     className="object-contain"
                                     priority
+                                    sizes="100px"
                                 />
                             </div>
                         </Link>
