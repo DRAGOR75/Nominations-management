@@ -31,8 +31,8 @@ export default async function JoinSessionPage({ params }: { params: Promise<{ se
     });
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4 font-sans text-slate-800">
-            <div className="max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-xl shadow-slate-200 border border-slate-100 overflow-hidden">
+        <div className="min-h-screen bg-slate-950 py-12 px-4 font-sans text-slate-800">
+            <div className="max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-xl shadow-slate-900/50 border border-slate-800 overflow-hidden">
 
                 {/* Header Section */}
                 {/* Header Section */}
@@ -248,7 +248,7 @@ function InputField({ label, name, type = "text", placeholder, icon }: { label: 
                     name={name}
                     required
                     type={type}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-slate-100/50"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-slate-100/50"
                     placeholder={placeholder}
                 />
             </div>
@@ -264,7 +264,7 @@ function TextAreaField({ label, name, placeholder, required = false }: { label: 
                 name={name}
                 required={required}
                 rows={3}
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-slate-100/50 resize-y min-h-[100px]"
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all hover:bg-slate-100/50 resize-y min-h-[100px]"
                 placeholder={placeholder}
             ></textarea>
         </div>

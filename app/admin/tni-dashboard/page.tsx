@@ -5,7 +5,7 @@ import EmployeeManager from '@/components/admin/EmployeeManager';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Master Data Management | Thriveni Training',
+    title: 'TNI Dashboard | Thriveni Training',
 };
 
 export const dynamic = 'force-dynamic';
@@ -39,16 +39,16 @@ export default async function MasterDataPage() {
     });
 
     return (
-        <main className="min-h-screen bg-slate-50 py-10 px-4 md:px-8">
+        <main className="min-h-screen bg-slate-950 py-10 px-4 md:px-8">
             <div className="max-w-7xl mx-auto space-y-8">
 
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl font-black text-slate-800">Master Data Management</h1>
-                    <p className="text-slate-500 mt-2">Manage essential system data: Sections, Programs, and Employee records.</p>
+                    <h1 className="text-3xl font-black text-white">TNI Dashboard</h1>
+                    <p className="text-slate-400 mt-2">Manage essential system data: Sections, Programs, and Employee records.</p>
                 </div>
 
-                <hr className="border-slate-200" />
+                <hr className="border-slate-800" />
 
                 {/* 1. SECTIONS */}
                 <SectionManager sections={sections} />

@@ -9,7 +9,7 @@ export async function createSection(formData: FormData) {
     const name = formData.get('name') as string;
     try {
         await db.section.create({ data: { name } });
-        revalidatePath('/admin/master-data');
+        revalidatePath('/admin/tni-dashboard');
         return { success: true };
     } catch (error) {
         return { error: 'Failed to create section' };
@@ -19,7 +19,7 @@ export async function createSection(formData: FormData) {
 export async function deleteSection(id: string) {
     try {
         await db.section.delete({ where: { id } });
-        revalidatePath('/admin/master-data');
+        revalidatePath('/admin/tni-dashboard');
         return { success: true };
     } catch (error) {
         return { error: 'Failed to delete section' };
@@ -44,7 +44,7 @@ export async function createProgram(formData: FormData) {
                 }
             }
         });
-        revalidatePath('/admin/master-data');
+        revalidatePath('/admin/tni-dashboard');
         return { success: true };
     } catch (error) {
         console.error("Program Create Error", error);
@@ -55,10 +55,28 @@ export async function createProgram(formData: FormData) {
 export async function deleteProgram(id: string) {
     try {
         await db.program.delete({ where: { id } });
-        revalidatePath('/admin/master-data');
+        revalidatePath('/admin/tni-dashboard');
         return { success: true };
     } catch (error) {
         return { error: 'Failed to delete program' };
+    }
+}
+
+export async function updateProgramSections(programId: string, sectionIds: string[]) {
+    try {
+        await db.program.update({
+            where: { id: programId },
+            data: {
+                sections: {
+                    set: sectionIds.map(id => ({ id }))
+                }
+            }
+        });
+        revalidatePath('/admin/tni-dashboard');
+        return { success: true };
+    } catch (error) {
+        console.error("Update Program Sections Error", error);
+        return { error: 'Failed to update program sections' };
     }
 }
 
@@ -78,7 +96,7 @@ export async function createEmployee(formData: FormData) {
                 manager_email: formData.get('manager_email') as string,
             }
         });
-        revalidatePath('/admin/master-data');
+        revalidatePath('/admin/tni-dashboard');
         return { success: true };
     } catch (error) {
         return { error: 'Failed to create employee (ID or Email might exist)' };
@@ -88,7 +106,7 @@ export async function createEmployee(formData: FormData) {
 export async function deleteEmployee(id: string) {
     try {
         await db.employee.delete({ where: { id } });
-        revalidatePath('/admin/master-data');
+        revalidatePath('/admin/tni-dashboard');
         return { success: true };
     } catch (error) {
         return { error: 'Failed to delete employee' };

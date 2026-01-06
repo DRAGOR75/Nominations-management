@@ -13,9 +13,16 @@ interface Program {
     sections: { id: string, name: string }[];
 }
 
+
+
+import { updateProgramSections } from '@/app/actions/master-data';
+
 export default function ProgramManager({ programs, allSections }: { programs: Program[], allSections: { id: string, name: string }[] }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [editingProgramId, setEditingProgramId] = useState<string | null>(null);
+    const [editSectionIds, setEditSectionIds] = useState<string[]>([]);
+
     const formRef = useRef<HTMLFormElement>(null);
 
     async function handleAdd(formData: FormData) {
@@ -24,6 +31,24 @@ export default function ProgramManager({ programs, allSections }: { programs: Pr
         setLoading(false);
         if (result?.error) alert(result.error);
         else formRef.current?.reset();
+    }
+
+    async function handleSaveSections() {
+        if (!editingProgramId) return;
+        setLoading(true);
+        const result = await updateProgramSections(editingProgramId, editSectionIds);
+        setLoading(false);
+        if (result?.error) {
+            alert(result.error);
+        } else {
+            setEditingProgramId(null);
+        }
+    }
+
+    function startEditing(prog: Program) {
+        setEditingProgramId(prog.id);
+        const currentIds = prog.sections.map(s => s.id);
+        setEditSectionIds(currentIds);
     }
 
     return (
@@ -54,12 +79,12 @@ export default function ProgramManager({ programs, allSections }: { programs: Pr
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Program Name</label>
-                                <input name="name" required placeholder="Safety First Level 1" className="w-full p-2 border border-slate-300 rounded text-sm outline-none focus:ring-2 focus:ring-emerald-500" />
+                                <input name="name" required placeholder="Safety First Level 1" className="w-full p-2 border border-slate-300 rounded text-sm outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-500 text-slate-800" />
                             </div>
 
                             <div>
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Category</label>
-                                <select name="category" className="w-full p-2 border border-slate-300 rounded text-sm outline-none bg-white">
+                                <select name="category" className="w-full p-2 border border-slate-300 rounded text-sm outline-none bg-white text-slate-800">
                                     <option value="FUNCTIONAL">Functional</option>
                                     <option value="BEHAVIOURAL">Behavioural</option>
                                     <option value="COMMON">Common</option>
@@ -71,10 +96,10 @@ export default function ProgramManager({ programs, allSections }: { programs: Pr
                             <div>
                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Target Grades</label>
                                 <div className="flex gap-4">
-                                    <label className="flex items-center gap-2 text-sm bg-white px-3 py-2 rounded border border-slate-300 cursor-pointer">
+                                    <label className="flex items-center gap-2 text-sm bg-white px-3 py-2 rounded border border-slate-300 cursor-pointer text-slate-600">
                                         <input type="checkbox" name="targetGrades" value="EXECUTIVE" className="accent-emerald-600" /> Executive
                                     </label>
-                                    <label className="flex items-center gap-2 text-sm bg-white px-3 py-2 rounded border border-slate-300 cursor-pointer">
+                                    <label className="flex items-center gap-2 text-sm bg-white px-3 py-2 rounded border border-slate-300 cursor-pointer text-slate-600">
                                         <input type="checkbox" name="targetGrades" value="WORKMAN" className="accent-emerald-600" /> Workman
                                     </label>
                                 </div>
@@ -97,16 +122,53 @@ export default function ProgramManager({ programs, allSections }: { programs: Pr
 
                     <div className="mt-6 space-y-3">
                         {programs.map((prog) => (
-                            <div key={prog.id} className="p-4 border rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition bg-white gap-4">
-                                <div>
-                                    <h4 className="font-bold text-slate-800">{prog.name}</h4>
-                                    <div className="flex flex-wrap gap-2 mt-1">
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">{prog.category}</span>
-                                        {prog.targetGrades.map(g => (
-                                            <span key={g} className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">{g}</span>
-                                        ))}
+                            <div key={prog.id} className="p-4 border border-slate-200 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition bg-white gap-4">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-bold text-slate-800">{prog.name}</h4>
+                                        <button
+                                            onClick={() => startEditing(prog)}
+                                            className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded transition-colors"
+                                        >
+                                            Edit Sections
+                                        </button>
                                     </div>
-                                    <p className="text-xs text-slate-400 mt-1">Sections: {prog.sections.map(s => s.name).join(', ') || 'All'}</p>
+
+                                    {editingProgramId === prog.id ? (
+                                        <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-lg animate-in fade-in zoom-in-95">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Edit Applicable Sections</label>
+                                            <div className="flex flex-wrap gap-2 mb-3">
+                                                {allSections.map(sec => (
+                                                    <label key={sec.id} className={`cursor-pointer px-2 py-1 rounded text-xs border ${editSectionIds.includes(sec.id) ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-white border-slate-200 text-slate-600'}`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            className="hidden"
+                                                            checked={editSectionIds.includes(sec.id)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) setEditSectionIds([...editSectionIds, sec.id]);
+                                                                else setEditSectionIds(editSectionIds.filter(id => id !== sec.id));
+                                                            }}
+                                                        />
+                                                        {sec.name}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={handleSaveSections} disabled={loading} className="px-3 py-1 bg-emerald-600 text-white text-xs font-bold rounded hover:bg-emerald-700">Save</button>
+                                                <button onClick={() => setEditingProgramId(null)} className="px-3 py-1 bg-white border border-slate-300 text-slate-600 text-xs font-bold rounded hover:bg-slate-50">Cancel</button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="mt-1">
+                                            <div className="flex flex-wrap gap-2">
+                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">{prog.category}</span>
+                                                {prog.targetGrades.map(g => (
+                                                    <span key={g} className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">{g}</span>
+                                                ))}
+                                            </div>
+                                            <p className="text-xs text-slate-500 mt-1">Sections: {prog.sections.map(s => s.name).join(', ') || 'All'}</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <button

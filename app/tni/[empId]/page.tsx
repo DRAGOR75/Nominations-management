@@ -11,7 +11,7 @@ export default async function TNIDashboardPage({ params }: { params: Promise<{ e
 
     if (!employee) {
         return (
-            <div className="min-h-screen bg-slate-50 p-8 flex flex-col items-center">
+            <div className="min-h-screen bg-slate-950 p-8 flex flex-col items-center">
                 <div className="max-w-2xl w-full bg-white p-8 rounded shadow text-center">
                     <h1 className="text-2xl font-bold mb-4">Employee ID: {empId} Not Found</h1>
                     <p className="mb-6 text-slate-600">This ID does not exist in our system yet.</p>
@@ -25,16 +25,16 @@ export default async function TNIDashboardPage({ params }: { params: Promise<{ e
     const nominations = employee.nominations || [];
 
     return (
-        <div className="min-h-screen bg-slate-50 p-8">
+        <div className="min-h-screen bg-slate-950 p-8">
             <div className="max-w-5xl mx-auto space-y-8">
 
                 {/* Header */}
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Training Portal</h1>
-                        <p className="text-slate-500">Welcome, {employee.name}</p>
+                        <h1 className="text-3xl font-bold text-white">Training Portal</h1>
+                        <p className="text-slate-400">Welcome, {employee.name}</p>
                     </div>
-                    <Link href="/tni" className="text-sm text-slate-500 hover:text-slate-800">Sign Out</Link>
+                    <Link href="/tni" className="text-sm text-slate-400 hover:text-slate-200">Sign Out</Link>
                 </div>
 
                 {/* Profile Section (Interactive) */}

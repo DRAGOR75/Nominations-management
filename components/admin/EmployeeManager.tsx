@@ -32,34 +32,59 @@ export default function EmployeeManager({ employees }: { employees: Employee[] }
     }
 
     // --- BULK UPLOAD ---
+    const [progress, setProgress] = useState<string>('');
+
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
         setUploading(true);
         setUploadStats(null);
+        setProgress('Parsing CSV...');
 
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
             complete: async (results) => {
-                const data = results.data as any[];
-                // Map CSV fields to expected Import Interface
-                // User CSV might use headers like "Employee Name", "Emp ID", etc.
-                // We'll trust they follow the template or map simply.
-                // Let's assume standard headers: id, name, email, grade, sectionName, location, manager_name, manager_email
+                const allData = results.data as any[];
+                const TOTAL_RECORDS = allData.length;
+                const CHUNK_SIZE = 500; // Client-side batch size
+
+                let successTotal = 0;
+                let allErrors: string[] = [];
 
                 try {
-                    const result = await processEmployeeUpload(data);
+                    for (let i = 0; i < TOTAL_RECORDS; i += CHUNK_SIZE) {
+                        const chunk = allData.slice(i, i + CHUNK_SIZE);
+                        const currentBatchNum = Math.floor(i / CHUNK_SIZE) + 1;
+                        const totalBatches = Math.ceil(TOTAL_RECORDS / CHUNK_SIZE);
+
+                        setProgress(`Processing batch ${currentBatchNum} of ${totalBatches} (${Math.min(i + CHUNK_SIZE, TOTAL_RECORDS)} / ${TOTAL_RECORDS} records)...`);
+
+                        const result = await processEmployeeUpload(chunk);
+
+                        if (result.success) {
+                            successTotal += result.count;
+                            if (result.errors && result.errors.length > 0) {
+                                allErrors = [...allErrors, ...result.errors];
+                            }
+                        } else {
+                            allErrors.push(`Batch ${currentBatchNum} failed completely.`);
+                        }
+                    }
+
                     setUploadStats({
-                        success: result.success ? result.count : 0,
-                        errors: result.success && result.errors ? result.errors : ["Unknown error"]
+                        success: successTotal,
+                        errors: allErrors
                     });
                 } catch (err) {
                     console.error(err);
-                    setUploadStats({ success: 0, errors: ["Failed to process file on server."] });
+                    setUploadStats({ success: successTotal, errors: [...allErrors, "Process interrupted or failed."] });
                 } finally {
                     setUploading(false);
+                    setProgress('');
+                    // Reset file input
+                    if (fileInputRef.current) fileInputRef.current.value = '';
                 }
             },
             error: (error) => {
@@ -103,15 +128,15 @@ export default function EmployeeManager({ employees }: { employees: Employee[] }
                             </h4>
                             <form ref={formRef} action={handleAdd} className="bg-slate-50 p-4 rounded-lg space-y-3 border border-slate-200">
                                 <div className="grid grid-cols-2 gap-3">
-                                    <input name="id" required placeholder="Emp ID *" className="p-2 text-sm border rounded w-full" />
-                                    <select name="grade" className="p-2 text-sm border rounded w-full">
+                                    <input name="id" required placeholder="Emp ID *" className="p-2 text-sm border border-slate-300 rounded w-full placeholder-slate-500 text-slate-900" />
+                                    <select name="grade" className="p-2 text-sm border border-slate-300 rounded w-full text-slate-900">
                                         <option value="EXECUTIVE">Executive</option>
                                         <option value="WORKMAN">Workman</option>
                                     </select>
                                 </div>
-                                <input name="name" required placeholder="Full Name *" className="p-2 text-sm border rounded w-full" />
-                                <input name="email" required type="email" placeholder="Email Address *" className="p-2 text-sm border rounded w-full" />
-                                <input name="sectionName" placeholder="Department / Section" className="p-2 text-sm border rounded w-full" />
+                                <input name="name" required placeholder="Full Name *" className="p-2 text-sm border border-slate-300 rounded w-full placeholder-slate-500 text-slate-900" />
+                                <input name="email" required type="email" placeholder="Email Address *" className="p-2 text-sm border border-slate-300 rounded w-full placeholder-slate-500 text-slate-900" />
+                                <input name="sectionName" placeholder="Department / Section" className="p-2 text-sm border border-slate-300 rounded w-full placeholder-slate-500 text-slate-900" />
 
                                 <button disabled={loading} className="w-full py-2 bg-purple-600 text-white rounded font-bold hover:bg-purple-700 transition disabled:opacity-50">
                                     {loading ? 'Adding...' : 'Add Employee'}
@@ -126,13 +151,16 @@ export default function EmployeeManager({ employees }: { employees: Employee[] }
                             </h4>
                             <div className="bg-slate-50 p-6 rounded-lg border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center h-full min-h-[200px]">
                                 {uploading ? (
-                                    <div className="animate-pulse text-purple-600 font-bold">Processing CSV Data...</div>
+                                    <div className="text-center">
+                                        <div className="animate-pulse text-purple-600 font-bold text-lg mb-2">Processing CSV Data...</div>
+                                        <div className="text-slate-500 font-medium">{progress}</div>
+                                    </div>
                                 ) : (
                                     <>
                                         <FileSpreadsheet size={32} className="text-slate-400 mb-2" />
                                         <p className="text-sm text-slate-600 mb-4">
                                             Upload CSV with headers:<br />
-                                            <code className="text-xs bg-slate-200 px-1 rounded">id, name, email, grade, sectionName, location, manager_name, manager_email</code>
+                                            <code className="text-xs bg-slate-200 px-1 rounded text-slate-700">id, name, email, grade, sectionName, location, manager_name, manager_email, program_name, start_date, end_date</code>
                                         </p>
                                         <input
                                             type="file"
@@ -174,7 +202,7 @@ export default function EmployeeManager({ employees }: { employees: Employee[] }
                     {/* RECENT EMPLOYEES LIST (Limited) */}
                     <div className="mt-8">
                         <h4 className="text-sm font-bold text-slate-700 mb-3">Recently Added Employees (Last 20)</h4>
-                        <div className="overflow-x-auto border rounded-xl">
+                        <div className="overflow-x-auto border border-slate-200 rounded-xl">
                             <table className="w-full text-left text-sm">
                                 <thead className="bg-slate-100 text-slate-500 font-bold uppercase text-xs">
                                     <tr>
