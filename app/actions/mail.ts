@@ -10,15 +10,20 @@ export async function notifyManagerAction(nominationId: string) {
     try {
         const nomination = await db.nomination.findUnique({
             where: { id: nominationId },
+            include: { employee: true }
         });
 
         if (!nomination) return { success: false, error: "Nomination not found" };
 
+        if (!nomination.employee.manager_email) {
+            return { success: false, error: "Manager email not found for employee" };
+        }
+
         return await sendApprovalEmail(
-            nomination.managerEmail,
-            nomination.managerName,
-            nomination.employeeName, // Corrected from nomineeName to employeeName
-            nomination.justification,
+            nomination.employee.manager_email,
+            nomination.employee.manager_name || "Manager",
+            nomination.employee.name,
+            nomination.justification || "No justification provided",
             nomination.id
         );
     } catch (error) {

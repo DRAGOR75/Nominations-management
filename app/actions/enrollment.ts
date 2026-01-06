@@ -51,7 +51,7 @@ export async function selfEnroll(formData: FormData) {
             create: data
         });
 
-        // 4. 🟢 REVALIDATION: Tell the server the Dashboard is now "Stale"
+
         revalidatePath("/admin/dashboard");
 
         // 5. Send Acknowledgment Email (Non-blocking)
