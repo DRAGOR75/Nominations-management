@@ -39,7 +39,7 @@ ADD COLUMN     "program_id" TEXT NOT NULL,
 ALTER COLUMN "justification" DROP NOT NULL;
 
 -- AlterTable
-ALTER TABLE "training_sessions" ADD COLUMN     "send_feedback_automatically" BOOLEAN NOT NULL DEFAULT false;
+-- ALTER TABLE "training_sessions" ADD COLUMN     "send_feedback_automatically" BOOLEAN NOT NULL DEFAULT false;
 
 -- CreateTable
 CREATE TABLE "employees" (
