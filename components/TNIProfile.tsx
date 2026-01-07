@@ -7,7 +7,7 @@ type Employee = {
     id: string;
     name: string;
     email: string;
-    grade: string;
+    grade: string | null;
     sectionName: string | null;
     location: string | null;
     manager_name: string | null;
@@ -27,7 +27,7 @@ export default function TNIProfile({ employee, sections }: { employee: Employee,
     const [formData, setFormData] = useState({
         name: employee.name,
         email: employee.email,
-        grade: employee.grade,
+        grade: employee.grade || '',
         sectionName: employee.sectionName || '',
         location: employee.location || '',
         manager_name: employee.manager_name || '',
@@ -107,6 +107,7 @@ export default function TNIProfile({ employee, sections }: { employee: Employee,
                             value={formData.grade}
                             onChange={e => setFormData({ ...formData, grade: e.target.value })}
                         >
+                            <option value="">Select Grade</option>
                             <option value="EXECUTIVE">EXECUTIVE</option>
                             <option value="WORKMAN">WORKMAN</option>
                         </select>
