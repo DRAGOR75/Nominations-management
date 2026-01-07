@@ -89,6 +89,22 @@ async function main() {
     });
     console.log(`✅ Admin ensured: ${email}`);
 
+    // 1.1. Second Admin User
+    const email2 = 'admin2@thriveni.com';
+    const password2 = 'thriveni2025'; // Same password for convenience, change as needed
+    const hashedPassword2 = await bcrypt.hash(password2, 10);
+
+    await prisma.user.upsert({
+        where: { email: email2 },
+        update: { password: hashedPassword2 },
+        create: {
+            email: email2,
+            name: 'Admin User 2',
+            password: hashedPassword2,
+        },
+    });
+    console.log(`✅ Second Admin ensured: ${email2}`);
+
     // 2. Create Sections
     const sectionMap = new Map<string, string>(); // Name -> ID
 
