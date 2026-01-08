@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { createEmployee, deleteEmployee } from '@/app/actions/master-data';
 import { processEmployeeUpload } from '@/app/actions/bulk-upload';
+import { FormSubmitButton } from '@/components/FormSubmitButton';
 import { Trash2, Users, Plus, ChevronDown, ChevronUp, Upload, FileSpreadsheet } from 'lucide-react';
 import Papa from 'papaparse';
 
@@ -138,9 +139,9 @@ export default function EmployeeManager({ employees }: { employees: Employee[] }
                                 <input name="email" required type="email" placeholder="Email Address *" className="p-2 text-sm border border-slate-300 rounded w-full placeholder-slate-500 text-slate-900" />
                                 <input name="sectionName" placeholder="Department / Section" className="p-2 text-sm border border-slate-300 rounded w-full placeholder-slate-500 text-slate-900" />
 
-                                <button disabled={loading} className="w-full py-2 bg-purple-600 text-white rounded font-bold hover:bg-purple-700 transition disabled:opacity-50">
-                                    {loading ? 'Adding...' : 'Add Employee'}
-                                </button>
+                                <FormSubmitButton className="w-full py-2 bg-purple-600 text-white rounded font-bold hover:bg-purple-700 transition disabled:opacity-50">
+                                    Add Employee
+                                </FormSubmitButton>
                             </form>
                         </div>
 

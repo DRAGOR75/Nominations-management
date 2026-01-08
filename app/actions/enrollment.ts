@@ -52,7 +52,7 @@ export async function selfEnroll(formData: FormData) {
         });
 
 
-        revalidatePath("/admin/dashboard");
+        // revalidatePath("/admin/dashboard"); // 🛑 DISABLED for performance. Admin can manual refresh.
 
         // 5. Send Acknowledgment Email (Non-blocking)
         // Fetch session name first if not available efficiently, but here we query it.

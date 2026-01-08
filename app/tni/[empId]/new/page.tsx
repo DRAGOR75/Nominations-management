@@ -1,6 +1,7 @@
 import { getAvailablePrograms, submitTNINomination, getEmployeeProfile } from '@/app/actions/tni';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
+import { FormSubmitButton } from '@/components/FormSubmitButton';
 
 export default async function NewNominationPage({ params }: { params: Promise<{ empId: string }> }) {
     const { empId } = await params;
@@ -90,9 +91,9 @@ export default async function NewNominationPage({ params }: { params: Promise<{ 
                                 ></textarea>
                             </div>
 
-                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <FormSubmitButton className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
                                 <Save size={20} /> Submit Nomination
-                            </button>
+                            </FormSubmitButton>
 
                         </form>
                     </div>

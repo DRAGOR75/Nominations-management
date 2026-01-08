@@ -13,6 +13,7 @@ import {
     BookOpen,
     Circle
 } from 'lucide-react';
+import { FormSubmitButton } from '@/components/FormSubmitButton';
 
 export default async function JoinSessionPage({ params }: { params: Promise<{ sessionId: string }> }) {
     // Await params in Next.js 15+
@@ -223,10 +224,12 @@ export default async function JoinSessionPage({ params }: { params: Promise<{ se
                         </div>
                     </section>
 
-                    <button type="submit" className="w-full group bg-blue-700 hover:bg-blue-800 text-white font-bold py-5 rounded-xl shadow-lg hover:shadow-blue-200 transition-all transform hover:-translate-y-0.5 mt-8 flex items-center justify-center gap-3">
+                    <FormSubmitButton
+                        className="w-full group bg-blue-700 hover:bg-blue-800 text-white font-bold py-5 rounded-xl shadow-lg hover:shadow-blue-200 transition-all transform hover:-translate-y-0.5 mt-8 flex items-center justify-center gap-3"
+                    >
                         <CheckCircle2 size={24} className="group-hover:scale-110 transition-transform" />
                         <span className="text-lg">Submit Feedback & Enroll</span>
-                    </button>
+                    </FormSubmitButton>
                 </form>
 
             </div>

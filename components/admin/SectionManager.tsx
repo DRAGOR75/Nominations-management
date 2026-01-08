@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { createSection, deleteSection } from '@/app/actions/master-data';
+import { FormSubmitButton } from '@/components/FormSubmitButton';
 import { Trash2, Layers, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Section {
@@ -52,9 +53,9 @@ export default function SectionManager({ sections }: { sections: Section[] }) {
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">New Section Name</label>
                             <input name="name" required placeholder="e.g. Mining, IT, HR" className="w-full p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 placeholder-slate-500" />
                         </div>
-                        <button disabled={loading} className="px-4 py-2 bg-indigo-600 text-white rounded font-bold hover:bg-indigo-700 transition disabled:opacity-50 flex items-center gap-2">
+                        <FormSubmitButton className="px-4 py-2 bg-indigo-600 text-white rounded font-bold hover:bg-indigo-700 transition disabled:opacity-50 flex items-center gap-2">
                             <Plus size={16} /> Add
-                        </button>
+                        </FormSubmitButton>
                     </form>
 
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

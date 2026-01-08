@@ -16,6 +16,7 @@ interface Program {
 
 
 import { updateProgramSections } from '@/app/actions/master-data';
+import { FormSubmitButton } from '@/components/FormSubmitButton';
 
 export default function ProgramManager({ programs, allSections }: { programs: Program[], allSections: { id: string, name: string }[] }) {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -115,9 +116,9 @@ export default function ProgramManager({ programs, allSections }: { programs: Pr
                             </div>
                         </div>
 
-                        <button disabled={loading} className="w-full py-2 bg-emerald-600 text-white rounded font-bold hover:bg-emerald-700 transition disabled:opacity-50 flex items-center justify-center gap-2">
+                        <FormSubmitButton className="w-full py-2 bg-emerald-600 text-white rounded font-bold hover:bg-emerald-700 transition disabled:opacity-50 flex items-center justify-center gap-2">
                             <Plus size={16} /> Create Program
-                        </button>
+                        </FormSubmitButton>
                     </form>
 
                     <div className="mt-6 space-y-3">

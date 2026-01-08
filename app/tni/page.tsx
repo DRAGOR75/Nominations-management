@@ -1,4 +1,5 @@
 import { checkEmployeeAccess } from '@/app/actions/tni';
+import { FormSubmitButton } from '@/components/FormSubmitButton';
 
 export default function TNILoginPage() {
     return (
@@ -22,9 +23,9 @@ export default function TNILoginPage() {
                                 className="w-full p-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 text-lg"
                             />
                         </div>
-                        <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        <FormSubmitButton className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2 px-4 rounded-md transition-colors">
                             Continue
-                        </button>
+                        </FormSubmitButton>
                     </form>
                 </div>
             </div>

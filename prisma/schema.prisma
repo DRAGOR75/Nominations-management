@@ -108,6 +108,9 @@ model TrainingSession {
   enrollments               Enrollment[]
 
   @@unique([programName, startDate, endDate, trainerName])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([feedbackCreationDate])
   @@map("training_sessions")
 }
 
@@ -143,6 +146,7 @@ model Enrollment {
 
   @@unique([sessionId, employeeEmail])
   @@index([sessionId])
+  @@index([status])
   @@map("enrollments")
 }
 
