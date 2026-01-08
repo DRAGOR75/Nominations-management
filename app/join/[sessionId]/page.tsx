@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { selfEnroll } from '@/app/actions/enrollment';
 import {

@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/lib/prisma';
 import SectionManager from '@/components/admin/SectionManager';
 import ProgramManager from '@/components/admin/ProgramManager';
 import EmployeeManager from '@/components/admin/EmployeeManager';
@@ -11,32 +11,33 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function MasterDataPage() {
-    // 1. Fetch Sections
-    const sections = await db.section.findMany({
-        orderBy: { name: 'asc' },
-        include: {
-            _count: { select: { programs: true } }
-        }
-    });
-
-    // 2. Fetch Programs (w/ Sections)
-    const programs = await db.program.findMany({
-        orderBy: { name: 'asc' },
-        include: { sections: { select: { id: true, name: true } } }
-    });
-
-    // 3. Fetch Employees (Limit to latest 100 for performance, they can search/bulk upload)
-    const employees = await db.employee.findMany({
-        take: 100,
-        orderBy: { id: 'desc' }, // Latest first
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            grade: true,
-            sectionName: true
-        }
-    });
+    // Parallel Fetching for Performance
+    const [sections, programs, employees] = await Promise.all([
+        // 1. Fetch Sections
+        db.section.findMany({
+            orderBy: { name: 'asc' },
+            include: {
+                _count: { select: { programs: true } }
+            }
+        }),
+        // 2. Fetch Programs (w/ Sections)
+        db.program.findMany({
+            orderBy: { name: 'asc' },
+            include: { sections: { select: { id: true, name: true } } }
+        }),
+        // 3. Fetch Employees (Limit to latest 100)
+        db.employee.findMany({
+            take: 100,
+            orderBy: { id: 'desc' },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                grade: true,
+                sectionName: true
+            }
+        })
+    ]);
 
     return (
         <main className="min-h-screen bg-slate-950 py-10 px-4 md:px-8">

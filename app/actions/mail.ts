@@ -1,7 +1,7 @@
 'use server'
 
 import { sendFeedbackRequestEmail } from '@/lib/email';
-import { db } from '@/lib/db';
+import { db } from '@/lib/prisma';
 
 /**
  * Triggered from the Training Sessions / Enrollments Dashboard

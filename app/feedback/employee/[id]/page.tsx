@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db } from '@/lib/prisma';
 import { submitEmployeeFeedback } from '@/app/actions';
 import { redirect } from 'next/navigation';
 
