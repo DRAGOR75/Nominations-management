@@ -39,10 +39,10 @@ export default async function TNIDashboardPage({ params }: { params: Promise<{ e
                             <div className="bg-slate-900 p-1.5 rounded-lg">
                                 <Clipboard className="text-white" size={20} />
                             </div>
-                            <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                            <div className="flex items-center gap-2 text-lg font-medium text-slate-600">
                                 <span className="hover:text-slate-900 transition-colors cursor-default">Nominations</span>
                                 <ChevronRight size={14} className="text-slate-400" />
-                                <span className="text-lg text-slate-900 font-bold  px-2 py-0.5 rounded-md">TNI Dashboard</span>
+                                <span className="text-lg text-slate-900 tracking-wide font-bold  px-2 py-0.5 rounded-md">TNI Dashboard</span>
                             </div>
                         </div>
 

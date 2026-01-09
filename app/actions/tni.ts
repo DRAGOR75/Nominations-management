@@ -120,6 +120,8 @@ export async function getAvailablePrograms(grade?: Grade, sectionName?: string) 
     });
 }
 
+import { sendTNIApprovalEmail } from '@/lib/email';
+
 export async function submitTNINomination(formData: FormData) {
     const empId = formData.get('empId') as string;
     const justification = formData.get('justification') as string;
@@ -155,6 +157,34 @@ export async function submitTNINomination(formData: FormData) {
             }))
         });
 
+        // --- NEW: SEND EMAIL TO MANAGER ---
+        // 1. Fetch Employee Details to get Manager Email & Name
+        const employee = await db.employee.findUnique({
+            where: { id: empId },
+            select: { name: true, manager_email: true, manager_name: true }
+        });
+
+        if (employee && employee.manager_email) {
+            // 2. Fetch Program Names for the email
+            const programs = await db.program.findMany({
+                where: { id: { in: programIds } },
+                select: { name: true }
+            });
+            const programNames = programs.map(p => p.name);
+
+            // 3. Send the single consolidated email
+            await sendTNIApprovalEmail(
+                employee.manager_email,
+                employee.manager_name || 'Manager',
+                employee.name,
+                programNames,
+                justification,
+                empId
+            );
+        } else {
+            console.warn(`Manager email not found for employee ${empId}, skipping email notification.`);
+        }
+
         // Revalidate is implicit if we redirect, or we can assume next refresh picks it up
     } catch (error) {
         console.error("Failed to submit nominations:", error);
@@ -162,4 +192,18 @@ export async function submitTNINomination(formData: FormData) {
     }
 
     redirect(`/tni/${empId}`);
+}
+
+export async function updateNominationStatus(nominationId: string, status: 'Approved' | 'Rejected') {
+    try {
+        await db.nomination.update({
+            where: { id: nominationId },
+            data: { status }
+        });
+        revalidatePath('/nominations/manager/[empId]');
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to update status:", error);
+        return { success: false, error: 'Failed to update status' };
+    }
 }

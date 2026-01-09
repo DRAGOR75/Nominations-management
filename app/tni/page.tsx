@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 import { Target, User, ArrowRight } from 'lucide-react';
+import { FormSubmitButton } from '@/components/FormSubmitButton';
+
 
 export default function TNILoginPage() {
 
@@ -45,12 +47,10 @@ export default function TNILoginPage() {
                             </div>
                         </div>
 
-                        <button
-                            type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
-                        >
-                            Access Portal <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                        </button>
+                        <FormSubmitButton className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-slate-900/20">
+                            <span>Continue</span>
+                            <ArrowRight size={20} />
+                        </FormSubmitButton>
                     </form>
                 </div>
 
