@@ -810,7 +810,7 @@ function EmployeeModal({ employee, isEdit, onClose, onSubmit, sectionOptions, lo
                             <SearchableSelect
                                 name="onRollContract"
                                 options={[
-                                    { label: 'On Roll', value: 'On Roll' },
+                                    { label: 'On-Roll', value: 'On-Roll' },
                                     { label: 'Contract', value: 'Contract' }
                                 ]}
                                 value={selectedOnRollContract}
