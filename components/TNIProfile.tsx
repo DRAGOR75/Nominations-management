@@ -535,7 +535,7 @@ export default function TNIProfile({ employee, sections, employeeView = false }:
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">On Roll / Contract *</label>
                         <SearchableSelect
                             options={[
-                                { label: 'On Roll', value: 'On Roll' },
+                                { label: 'On-Roll', value: 'On-Roll' },
                                 { label: 'Contract', value: 'Contract' }
                             ]}
                             value={formData.onRollContract}
