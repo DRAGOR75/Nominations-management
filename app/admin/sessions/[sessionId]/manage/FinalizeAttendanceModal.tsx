@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { patchEmployeeProfile, getDesignations, getSections } from '@/app/actions/master-data';
+import { patchEmployeeProfile, getDesignations, getSections, getLocations } from '@/app/actions/master-data';
 import { HiOutlineCheckCircle, HiOutlineExclamationCircle, HiXMark } from 'react-icons/hi2';
 
 interface FinalizeAttendanceModalProps {
@@ -48,17 +48,19 @@ export default function FinalizeAttendanceModal({
     const [customOrganization, setCustomOrganization] = useState('');
     const [customDesignation, setCustomDesignation] = useState('');
     const [customSection, setCustomSection] = useState('');
-    
+
     const [orgMode, setOrgMode] = useState<'select' | 'custom'>('select');
     const [designationMode, setDesignationMode] = useState<'select' | 'custom'>('select');
     const [sectionMode, setSectionMode] = useState<'select' | 'custom'>('select');
-    
+
     const [designationOptions, setDesignationOptions] = useState<{ label: string, value: string }[]>([]);
     const [sectionOptions, setSectionOptions] = useState<{ label: string, value: string }[]>([]);
+    const [locationOptions, setLocationOptions] = useState<{ label: string, value: string }[]>([]);
 
     useEffect(() => {
         getDesignations().then(desigs => setDesignationOptions(desigs));
         getSections().then(secs => setSectionOptions(secs));
+        getLocations().then(locs => setLocationOptions(locs));
     }, []);
 
     useEffect(() => {
@@ -91,7 +93,7 @@ export default function FinalizeAttendanceModal({
             const org = employee.organization || '';
             const isStandardOrg = ['LMEL', 'TSMPL', 'MTLL', 'TEIPL', ''].includes(org);
             setCustomOrganization(isStandardOrg ? '' : org);
-            
+
             setCustomDesignation('');
             setCustomSection('');
 
@@ -117,7 +119,7 @@ export default function FinalizeAttendanceModal({
         const finalOrganization = orgMode === 'custom' ? customOrganization : formData.organization;
         const finalDesignation = designationMode === 'custom' ? customDesignation : formData.designation;
         const finalSection = sectionMode === 'custom' ? customSection : formData.sectionName;
-        
+
         requiredFields.forEach(field => {
             if (field === 'organization') {
                 if (!finalOrganization) {
@@ -155,13 +157,13 @@ export default function FinalizeAttendanceModal({
             const finalOrganization = orgMode === 'custom' ? customOrganization : formData.organization;
             const finalDesignation = designationMode === 'custom' ? customDesignation : formData.designation;
             const finalSection = sectionMode === 'custom' ? customSection : formData.sectionName;
-            await patchEmployeeProfile(employee.id, { 
-                ...formData, 
+            await patchEmployeeProfile(employee.id, {
+                ...formData,
                 organization: finalOrganization,
                 designation: finalDesignation,
                 sectionName: finalSection
             });
-            
+
             // Call the actual finalization function
             await onFinalize();
             onClose();
@@ -178,7 +180,7 @@ export default function FinalizeAttendanceModal({
     return (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-3xl shadow-xl border border-slate-200 w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
-                
+
                 {/* Header */}
                 <div className="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50">
                     <div>
@@ -210,13 +212,13 @@ export default function FinalizeAttendanceModal({
                         <div className="col-span-1 md:col-span-2">
                             <h3 className="text-sm font-bold text-slate-900 mb-3 border-b border-slate-100 pb-2">Personal Details</h3>
                         </div>
-                        
+
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-slate-500">Name</label>
                             <input
                                 type="text"
                                 value={formData.name}
-                                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.name ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             />
                         </div>
@@ -226,7 +228,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="email"
                                 value={formData.email}
-                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.email ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             />
                         </div>
@@ -236,17 +238,17 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.mobile}
-                                onChange={(e) => setFormData({...formData, mobile: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.mobile ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             />
                         </div>
-                        
+
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-slate-500">Date of Birth</label>
                             <input
                                 type="date"
                                 value={formData.dob}
-                                onChange={(e) => setFormData({...formData, dob: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.dob ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             />
                         </div>
@@ -256,7 +258,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.aadharNumber}
-                                onChange={(e) => setFormData({...formData, aadharNumber: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border-slate-200`}
                             />
                         </div>
@@ -265,7 +267,7 @@ export default function FinalizeAttendanceModal({
                             <label className="text-xs font-bold text-slate-500">Gender</label>
                             <select
                                 value={formData.gender}
-                                onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.gender ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             >
                                 <option value="">Select Gender...</option>
@@ -289,7 +291,7 @@ export default function FinalizeAttendanceModal({
                                             setOrgMode('custom');
                                             setCustomOrganization('');
                                         } else {
-                                            setFormData({...formData, organization: e.target.value});
+                                            setFormData({ ...formData, organization: e.target.value });
                                         }
                                     }}
                                     className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.organization ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
@@ -328,7 +330,7 @@ export default function FinalizeAttendanceModal({
                             <label className="text-xs font-bold text-slate-500">Grade</label>
                             <select
                                 value={formData.grade}
-                                onChange={(e) => setFormData({...formData, grade: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.grade ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             >
                                 <option value="">Select Grade...</option>
@@ -344,7 +346,7 @@ export default function FinalizeAttendanceModal({
                             <label className="text-xs font-bold text-slate-500">M/NM/W</label>
                             <select
                                 value={formData.employeeGrouupMNmw}
-                                onChange={(e) => setFormData({...formData, employeeGrouupMNmw: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, employeeGrouupMNmw: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.employeeGrouupMNmw ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             >
                                 <option value="">Select M/NM/W...</option>
@@ -356,12 +358,23 @@ export default function FinalizeAttendanceModal({
 
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-slate-500">Department Group</label>
-                            <input
-                                type="text"
+                            <select
                                 value={formData.departmentGroup}
-                                onChange={(e) => setFormData({...formData, departmentGroup: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, departmentGroup: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.departmentGroup ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
-                            />
+                            >
+                                <option value="">Select Department Group...</option>
+                                <option value="AC ELECTRICAL">AC ELECTRICAL</option>
+                                <option value="HEMM">HEMM</option>
+                                <option value="HEMM LS">HEMM LS</option>
+                                <option value="HEMM AUTO ELECT">HEMM AUTO ELECT</option>
+                                <option value="STORES AND PROCUREMENT">STORES AND PROCUREMENT</option>
+                                <option value="OPERATORS">OPERATORS</option>
+                                <option value="HR/ADMIN/FINANCE">HR/ADMIN/FINANCE</option>
+                                <option value="OTHERS/UNDEFINED">OTHERS/UNDEFINED</option>
+                                <option value="C&S">C&S</option>
+                                <option value="MINING">MINING</option>
+                            </select>
                         </div>
 
                         <div className="space-y-1">
@@ -369,7 +382,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.department}
-                                onChange={(e) => setFormData({...formData, department: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border-slate-200`}
                             />
                         </div>
@@ -384,7 +397,7 @@ export default function FinalizeAttendanceModal({
                                             setSectionMode('custom');
                                             setCustomSection('');
                                         } else {
-                                            setFormData({...formData, sectionName: e.target.value});
+                                            setFormData({ ...formData, sectionName: e.target.value });
                                         }
                                     }}
                                     className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.sectionName ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
@@ -420,12 +433,15 @@ export default function FinalizeAttendanceModal({
 
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-slate-500">On Roll Contract</label>
-                            <input
-                                type="text"
+                            <select
                                 value={formData.onRollContract}
-                                onChange={(e) => setFormData({...formData, onRollContract: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, onRollContract: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.onRollContract ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
-                            />
+                            >
+                                <option value="">Select On Roll / Contract...</option>
+                                <option value="On-Roll">On-Roll</option>
+                                <option value="Contract">Contract</option>
+                            </select>
                         </div>
 
                         <div className="space-y-1">
@@ -438,7 +454,7 @@ export default function FinalizeAttendanceModal({
                                             setDesignationMode('custom');
                                             setCustomDesignation('');
                                         } else {
-                                            setFormData({...formData, designation: e.target.value});
+                                            setFormData({ ...formData, designation: e.target.value });
                                         }
                                     }}
                                     className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.designation ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
@@ -477,21 +493,21 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.highestQualification}
-                                onChange={(e) => setFormData({...formData, highestQualification: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, highestQualification: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border-slate-200`}
                             />
                         </div>
-                        
+
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-slate-500">Date of Joining</label>
                             <input
                                 type="date"
                                 value={formData.doj}
-                                onChange={(e) => setFormData({...formData, doj: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, doj: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border-slate-200`}
                             />
                         </div>
-                        
+
                         <div className="col-span-1 md:col-span-2 mt-4">
                             <h3 className="text-sm font-bold text-slate-900 mb-3 border-b border-slate-100 pb-2">Manager Details</h3>
                         </div>
@@ -501,7 +517,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.managerName}
-                                onChange={(e) => setFormData({...formData, managerName: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, managerName: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.managerName ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             />
                         </div>
@@ -511,7 +527,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.managerId}
-                                onChange={(e) => setFormData({...formData, managerId: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, managerId: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.managerId ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             />
                         </div>
@@ -521,7 +537,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="email"
                                 value={formData.managerEmail}
-                                onChange={(e) => setFormData({...formData, managerEmail: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, managerEmail: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border-slate-200`}
                             />
                         </div>
@@ -531,7 +547,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.managerMobile}
-                                onChange={(e) => setFormData({...formData, managerMobile: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, managerMobile: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border-slate-200`}
                             />
                         </div>
@@ -541,23 +557,27 @@ export default function FinalizeAttendanceModal({
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-500">Employee Region</label>
+                            <label className="text-xs font-bold text-slate-500">Employee Location</label>
                             <input
                                 type="text"
                                 value={formData.region}
-                                onChange={(e) => setFormData({...formData, region: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, region: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.region ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                             />
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-slate-500">Employee Location</label>
-                            <input
-                                type="text"
+                            <label className="text-xs font-bold text-slate-500">Employee Region</label>
+                            <select
                                 value={formData.location}
-                                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none ${errors.location ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
-                            />
+                            >
+                                <option value="">Select Employee Region...</option>
+                                {locationOptions.map(loc => (
+                                    <option key={loc.value} value={loc.value}>{loc.label}</option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="space-y-1">
@@ -565,7 +585,7 @@ export default function FinalizeAttendanceModal({
                             <input
                                 type="text"
                                 value={formData.projectLocation}
-                                onChange={(e) => setFormData({...formData, projectLocation: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, projectLocation: e.target.value })}
                                 className={`w-full text-sm p-2.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none border-slate-200`}
                             />
                         </div>
