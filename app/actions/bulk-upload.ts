@@ -87,7 +87,6 @@ interface EmployeeImportRow {
     'Aadhar Number'?: string;
     'Employee Group M/NM/W'?: string;
     'On-Roll / Contract'?: string;
-    // Newly added fallback headers
     'Email'?: string;
     'Project Location'?: string;
     'Manager Name'?: string;
@@ -95,7 +94,6 @@ interface EmployeeImportRow {
     'Manager Mobile'?: string;
     'Employee Group (M/NM/W)'?: string;
     'On Roll/Contract'?: string;
-
 }
 
 export async function processEmployeeUpload(rowData: EmployeeImportRow[]) {
