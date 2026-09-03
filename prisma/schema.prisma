@@ -216,8 +216,7 @@ model TrainingSession {
   nominationBatch NominationBatch? @relation(fields: [nominationBatchId], references: [id])
   cohortProgram   CohortProgram? // If this session is part of a cohort
   emailLogs       EmailLog[]
-
-  @@unique([programName, startDate, endDate, trainerName])
+  
   @@index([startDate])
   @@index([endDate])
   @@index([feedbackCreationDate])

@@ -140,7 +140,7 @@ export async function sendApprovalEmail(
   const approvalLink = `${baseUrl}/nominations/manager/${nominationId}?token=${token}`;
 
   const html = `
-    <div style="font-family: Georgia, serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="font-family: Helvetica, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #0056b3;">Nomination Approval Request</h2>
       <p>Dear <strong>${managerName}</strong>,</p>
       <p>A training nomination has been submitted for <strong>${employeeName}</strong>.</p>
@@ -170,7 +170,7 @@ export async function sendFeedbackRequestEmail(
   const feedbackLink = `${baseUrl}/feedback/employee/${enrollmentId}?token=${token}`;
 
   const html = `
-    <div style="font-family: Georgia, serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="font-family: Helvetica, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #2e7d32;">Post Training Performance Assessment</h2>
       <p>Dear <strong>${employeeName}</strong>,</p>
       <p>Thank you for participating in the <strong>${programName}</strong> program.</p>
@@ -203,7 +203,7 @@ export async function sendTrainerReminderEmail(
   const baseUrl = getBaseUrl();
 
   const html = `
-    <div style="font-family: Georgia, serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="font-family: Helvetica, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #d32f2f;">Reminder: Post-Training Feedback Deadline</h2>
       
       <p>This is a reminder to please proceed for the Post Training Feedback for <strong>${programName}</strong> conducted on <strong>${startDateStr}</strong> to <strong>${endDateStr}</strong>.</p>
@@ -239,7 +239,7 @@ export async function sendFeedbackAcknowledgmentEmail(
   }
 ) {
   const html = `
-    <div style="font-family: Georgia, serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="font-family: Helvetica, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #0056b3;">Feedback Received</h2>
       <p>Dear <strong>${name}</strong>,</p>
       <p>Thank you for submitting your feedback for the training program <strong>${programName}</strong>.</p>
@@ -310,7 +310,7 @@ export async function sendManagerRejectionNotification(
   const subject = `Urgent: Manager Disagreed with Feedback - ${employeeName}`;
 
   const html = `
-    <div style="font-family: Georgia, serif; padding: 20px; border: 1px solid #d32f2f; border-radius: 8px;">
+    <div style="font-family: Helvetica, sans-serif; padding: 20px; border: 1px solid #d32f2f; border-radius: 8px;">
       <h2 style="color: #d32f2f;">Manager Disagreement Alert</h2>
       <p>The manager <strong>${managerName}</strong> has reviewed the post-training feedback for <strong>${employeeName}</strong> for (${programName}) and disagrees with the comments.</p>
       
@@ -349,7 +349,7 @@ export async function sendFeedbackReviewRequestEmail(
   const managerLink = `${baseUrl}/feedback/manager/${enrollmentId}?token=${token}`;
 
   const html = `
-    <div style="font-family: Georgia, serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="font-family: Helvetica, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #0056b3;">Post training (30 days) performance feedback</h2>
       <p>Dear <strong>${managerName || 'Manager'}</strong>,</p>
       <p>The employee <strong>${employeeName}</strong> has submitted their post-training (30 days) performance feedback for the program <strong>${programName}</strong>.</p>
@@ -439,7 +439,7 @@ export async function sendManagerSessionApprovalEmail(
   const endDateStr = dateFormatter.format(endDate);
 
   const html = `
-    <div style="font-family: Georgia, serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="font-family: Helvetica, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
       <h2 style="color: #0056b3;">Training Nomination Approval Required</h2>
       <p>Dear <strong>${managerName || 'Manager'}</strong>,</p>
       <p>Your team member <strong>${employeeName}</strong> has been selected for the following training session:</p>
@@ -508,7 +508,7 @@ export function generateBatchInvitationHtml(
   `).join('');
 
   return `
-    <div style="font-family: Georgia, serif; line-height: 1.6; color: #000000ff; padding: 20px;">
+    <div style="font-family: Helvetica, sans-serif; line-height: 1.6; color: #000000ff; padding: 20px;">
       <p>Dear All,</p>
       
       <p>Greetings of the day.</p>
@@ -528,6 +528,10 @@ export function generateBatchInvitationHtml(
           <h4 style="margin: 0 0 5px 0; color: #0056b3; font-size: 14px;">Program Objectives:</h4>
           <p style="margin: 0; font-size: 14px; color: #444; white-space: pre-wrap;">${objectives}</p>
         </div>` : ''}
+      </div>
+
+      <div style="background-color: #fff3cd; color: #856404; padding: 15px; border-left: 4px solid #ffeeba; margin: 20px 0;">
+        <p style="margin: 0;"><strong>Important Note:</strong> Please ensure you bring your safety shoes and helmet if they are required for this program. If you are travelling from an outstation location, please plan your travel arrangements accordingly.</p>
       </div>
 
       <h3 style="color: #444; margin-top: 30px;">Confirmed Participants</h3>
