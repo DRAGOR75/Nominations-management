@@ -89,8 +89,33 @@ export default function GanttCalendar({ programs, sessions, trainers, locations,
         }
     });
 
-    const activeTrainers = [...trainers, ...customTrainers, { id: 'unassigned', name: 'Unassigned' }];
+    let activeTrainers = [...trainers, ...customTrainers, { id: 'unassigned', name: 'Unassigned' }];
 
+    // Sort activeTrainers by the number of sessions in the current view
+    const getSessionCount = (trainerName: string) => {
+        return sessions.filter(s => {
+            if (trainerName === 'Unassigned') {
+                return !s.trainerName || s.trainerName === 'Unassigned' || s.trainerName === 'TBD';
+            }
+            if (!s.trainerName) return false;
+            const sessionTrainers = s.trainerName.split(/,|&|\band\b/i).map(t => t.trim());
+            return sessionTrainers.includes(trainerName);
+        }).length;
+    };
+
+    const sessionCounts = new Map<string, number>();
+    activeTrainers.forEach(t => sessionCounts.set(t.name, getSessionCount(t.name)));
+
+    activeTrainers.sort((a, b) => {
+        if (a.name === 'Unassigned') return 1;
+        if (b.name === 'Unassigned') return -1;
+        const countA = sessionCounts.get(a.name) || 0;
+        const countB = sessionCounts.get(b.name) || 0;
+        if (countA !== countB) {
+            return countB - countA; // Descending order
+        }
+        return a.name.localeCompare(b.name);
+    });
     const trainerColors = [
         'from-blue-500 to-blue-600',
         'from-emerald-500 to-emerald-600',

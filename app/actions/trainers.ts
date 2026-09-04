@@ -6,9 +6,40 @@ import bcrypt from "bcryptjs";
 
 // 1. Fetch All Trainers
 export async function getTrainers() {
-    return await db.trainer.findMany({
+    const trainers = await db.trainer.findMany({
         orderBy: { name: 'asc' }
     });
+
+    const sessionCounts = await db.trainingSession.groupBy({
+        by: ['trainerName'],
+        _count: {
+            _all: true
+        },
+        where: {
+            trainerName: { not: null }
+        }
+    });
+
+    const countMap = new Map<string, number>();
+    for (const item of sessionCounts) {
+        if (item.trainerName) {
+            countMap.set(item.trainerName, item._count._all);
+        }
+    }
+
+    const trainersWithCounts = trainers.map(t => ({
+        ...t,
+        trainingCount: countMap.get(t.name) || 0
+    }));
+
+    trainersWithCounts.sort((a, b) => {
+        if (b.trainingCount !== a.trainingCount) {
+            return b.trainingCount - a.trainingCount;
+        }
+        return a.name.localeCompare(b.name);
+    });
+
+    return trainersWithCounts;
 }
 
 // 2. Add a New Trainer (Updated for new schema)

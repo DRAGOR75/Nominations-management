@@ -22,6 +22,7 @@ type Trainer = {
     name: string;
     email: string | null;
     phone: string | null;
+    trainingCount?: number;
 };
 
 export default function TrainerManager({ trainers }: { trainers: Trainer[] }) {
@@ -196,6 +197,11 @@ export default function TrainerManager({ trainers }: { trainers: Trainer[] }) {
                                             <HiOutlineEnvelope size={12} className="shrink-0 text-blue-400" />
                                             <span className="truncate">{t.email}</span>
                                         </div>
+                                        {t.trainingCount !== undefined && (
+                                            <div className="flex items-center gap-1.5 min-w-0 mt-0.5">
+                                                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">{t.trainingCount} Sessions</span>
+                                            </div>
+                                        )}
                                         {t.phone && (
                                             <div className="flex items-center gap-1.5 min-w-0 mt-0.5">
                                                 <HiOutlinePhone size={12} className="shrink-0 text-emerald-400" />
